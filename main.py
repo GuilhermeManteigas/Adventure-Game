@@ -48,9 +48,9 @@ def load_image_resources():
     ########## index 0 reserved for future use ##########
     images.append(pygame.image.load('dirt.png').convert())
     #####################################################
-    images.append(pygame.image.load('dirt.png').convert())  # id = 1
-    images.append(pygame.image.load('stone.png').convert())  # id = 2
-    images.append(pygame.image.load('grass.png').convert())  # id = 3
+    images.append(pygame.image.load('grass.png').convert())  # id = 1
+    images.append(pygame.image.load('sand.png').convert())  # id = 2
+    images.append(pygame.image.load('water.png').convert())  # id = 3
 
     return images
 
