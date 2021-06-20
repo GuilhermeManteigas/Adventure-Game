@@ -1,29 +1,14 @@
 import os
 from worldgenerator import WorldGenerator
+from player import Player
 import pygame
 import threading
 import time
 import random
 
 
-
 os.environ["SDL_VIDEO_CENTERED"] = "1"
 pygame.init()
-
-
-FPS_FONT = pygame.font.SysFont("Verdana", 15)
-
-black = (0, 0, 0)
-
-Game_Map_Size = 30
-Game_Tick = 0.1
-game_running = True
-
-# Define some colors
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-GREEN = (0, 255, 0)
-RED = (255, 0, 0)
 
 size = (1280, 720)
 #screen = pygame.display.set_mode(size, pygame.SCALED | pygame.RESIZABLE) #pygame.FULLSCREEN
@@ -32,47 +17,108 @@ size = (1280, 720)
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption("Adventure Game")
 
-# The loop will carry on until the user exit the game (e.g. clicks the close button).
-carryOn = True
+black = (0, 0, 0)
 
+Game_Map_Size = 30
+Game_Tick = 0.1
+game_running = True
+# The loop will carry on until the user exit the game (e.g. clicks the close button).
+playing = True
 # The clock will be used to control how fast the screen updates
 clock = pygame.time.Clock()
+# Player declaration
+player = Player(50, 50)
+
+# Define some colors
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+GREEN = (0, 255, 0)
+RED = (255, 0, 0)
+
+world = WorldGenerator(100, 100).get_world()
+world_section = []
+Cube_Size = 30
+scroll = [0, 0]
+true_scroll = [0, 0]
+
+
+def load_image_resources():
+    ############### Blocks ##############################
+    images = []
+    ########## index 0 reserved for future use ##########
+    images.append(pygame.image.load('dirt.png').convert())
+    #####################################################
+    images.append(pygame.image.load('dirt.png').convert())  # id = 1
+    images.append(pygame.image.load('stone.png').convert())  # id = 2
+    images.append(pygame.image.load('grass.png').convert())  # id = 3
+
+    return images
+
+
+image_resources = load_image_resources()
+
+def update_world_section():
+    global world_section
+    radiusx = 2000
+    radiusy = 1000
+    while True:
+        temp_world = []
+        for i in world:
+            if abs(player.x - i.x*Cube_Size) < radiusx and abs(player.y - i.y*Cube_Size) < radiusy:
+                temp_world.append(i)
+        world_section = temp_world[:]
+        time.sleep(Game_Tick*5)
+
+def draw_world():
+    screen_width, screen_height = screen.get_size()
+    counter = 0
+    for idx, i in enumerate(world_section):
+        if (player.x - (screen_width/2)) - Cube_Size * 5 < i.x * Cube_Size < (player.x + (screen_width/2)) + Cube_Size * 5 and (player.y - (screen_height/2)) - Cube_Size * 5 < i.y * Cube_Size < (player.y + (screen_height/2)) + Cube_Size * 5:
+            if i.id != 0:
+                screen.blit(image_resources[i.id], (i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1]))
+
+        counter = idx
+
 
 def show_fps(window, clock):
+    FPS_FONT = pygame.font.SysFont("Verdana", 15)
+    black = pygame.Color("black")
     fps_overlay = FPS_FONT.render(str(int(clock.get_fps())), True, black)
-    window.blit(fps_overlay, (50, 50))
+    window.blit(fps_overlay, (0, 0))
+
 
 def player_movement_handler():
-    global screen
     while game_running:
         keys = pygame.key.get_pressed()
         if keys[pygame.K_a]:
-            #if screen.get_flags() & pygame.FULLSCREEN:
-            #    pygame.display.set_mode(size)
-            #else:
-            #    pygame.display.set_mode(size)
-            #    pygame.display.set_mode(size, pygame.FULLSCREEN)
-            print("d")
-            global screen
-            screen = pygame.display.set_mode(size)
+            player.move(player.x - player.speed, player.y)
+        elif keys[pygame.K_d]:
+            player.move(player.x + player.speed, player.y)
+        if keys[pygame.K_w]:
+            player.move(player.x, player.y - player.speed)
+        if keys[pygame.K_s]:
+            player.move(player.x, player.y + player.speed)
 
-        time.sleep(Game_Tick)
+        time.sleep(Game_Tick/15)
 
 
 player_movement = threading.Thread(target=player_movement_handler)
 player_movement.start()
 
-World_width = 1000
-World_height = 1000
+update_visible_world = threading.Thread(target=update_world_section)
+update_visible_world.start()
 
-world = WorldGenerator(World_width, World_height).get_world()
+
+
+
+#pygame.display.toggle_fullscreen()
 
 # -------- Main Program Loop -----------
-while carryOn:
+while playing:
     # --- Main event loop
     for event in pygame.event.get():  # User did something
         if event.type == pygame.QUIT:  # If user clicked close
-            carryOn = False  # Flag that we are done so we exit this loop
+            playing = False  # Flag that we are done so we exit this loop
         if (event.type is pygame.KEYDOWN and event.key == pygame.K_f):
             print("f")
             if screen.get_flags() & pygame.FULLSCREEN:
@@ -82,12 +128,24 @@ while carryOn:
 
     screen.fill(WHITE)
 
-    pygame.draw.rect(screen, BLACK, pygame.Rect(0, 0, 30, 30), 0)
+    screen_width, screen_height = screen.get_size()
+    true_scroll[0] += (player.x - true_scroll[0] - (screen_width / 2)) / 20
+    true_scroll[1] += (player.y - true_scroll[1] - (screen_height / 2)) / 20
+    scroll = true_scroll.copy()
+    scroll[0] = int(scroll[0])
+    scroll[1] = int(scroll[1])
+
+    draw_world()
+
+    screen.blit(player.image, (player.x - scroll[0], player.y - scroll[1]))
+    show_fps(screen, clock)
+
+
+
 
 
     pygame.display.flip()
 
-    show_fps(screen, clock)
     clock.tick(120)
 
 pygame.quit()
