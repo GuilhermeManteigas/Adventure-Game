@@ -54,7 +54,7 @@ class WorldGenerator:
                 ny = y / self.height - 0.5
                 value[y][x] = noise(nx, ny)
 
-                basePerlinValue = (snoise2(float(x) * 384 * 0.01, float(y) * 384 * 0.01, octaves=60, persistence=0.2,lacunarity=2, repeatx=4048, repeaty=4048, base=random.random() * 2048) + 1) / 2.0
+                basePerlinValue = (snoise2(float(x) * 384 * 0.01, float(y) * 384 * 0.01, octaves=60, persistence=0.2, lacunarity=2, repeatx=4048, repeaty=4048, base=random.random() * 2048) + 1) / 2.0
                 print(basePerlinValue)
                 if basePerlinValue > 0.6:
                     self.world.append(Block(1, x, y))
@@ -66,6 +66,79 @@ class WorldGenerator:
         #basePerlinValue = (snoise2(float(x)*0.0025, float(y)*0.0025, octaves=8, persistence=0.5, lacunarity=2.0, repeatx=2048, repeaty=2048, base=random.random()*2048) + 1)/2.0;
 
     def generategui(self):
+        # Generate Grass
+        start_time = time.time()
+        self.world = [[Block(1, x, y) for x in range(self.height)] for y in range(self.width)]
+        print("--- %s seconds ---" % (time.time() - start_time))
+        start_time = time.time()
+
+        #print(self.world)
+
+
+        # Generate water
+        for i in range(self.height):
+            for j in range(self.width):
+                if random.randint(0, 1000) == 1:
+                    self.world[i][j].id = 3
+
+        #for i in self.world:
+           #if random.randint(0, 1000) == 1:
+               #self.world[self.world.index(i)] = Block(3, i.x, i.y)
+        print("--- %s seconds ---" % (time.time() - start_time))
+        start_time = time.time()
+
+        # Build on water
+        for c in range(2, 200):
+            for i in range(self.height):
+                for j in range(self.width):
+                    if self.world[i][j].id == 3:
+                        if random.randint(0, c) == 1 and j > 0:
+                            self.world[i][j-1].id = 3
+                            #self.world[self.world.index(i)-1] = Block(3, self.world[self.world.index(i)-1].x, self.world[self.world.index(i)-1].y)
+                        if random.randint(0, c) == 1 and j < self.width - 1:
+                            self.world[i][j + 1].id = 3
+                            #self.world[self.world.index(i)+1] = Block(3, self.world[self.world.index(i)+1].x, self.world[self.world.index(i) + 1].y)
+                        if random.randint(0, c) == 1 and i > 0:
+                            self.world[i-1][j].id = 3
+                            #self.world[self.world.index(i)-self.width] = Block(3, self.world[self.world.index(i)-self.width].x, self.world[self.world.index(i) - self.width].y)
+                        if random.randint(0, c) == 1 and i < self.height - 1:
+                            self.world[i + 1][j].id = 3
+                            #self.world[self.world.index(i)+self.width] = Block(3, self.world[self.world.index(i)+self.width].x, self.world[self.world.index(i) + self.width].y)
+        print("--- %s seconds ---" % (time.time() - start_time))
+
+
+        # Remove single block islands
+        start_time = time.time()
+        for i in range(self.height):
+            for j in range(self.width):
+                if self.world[i][j].id == 3:
+                    if j > 0 and j < self.width - 1 and i > 0 and i < self.height - 1:
+                        if self.world[i+1][j].id == 3 and self.world[i-1][j].id == 3 and self.world[i][j+1].id == 3 and self.world[i][j-1].id == 3:
+                            self.world[i][j].id = 3
+        print("--- %s seconds ---" % (time.time() - start_time))
+
+        # Generate sand
+        for i in range(self.height):
+            for j in range(self.width):
+                if self.world[i][j].id == 3:
+                    if i > 0 and self.world[i-1][j].id == 3:
+                        #self.world[self.world.index(i) - 1] = Block(2, self.world[self.world.index(i) - 1].x,self.world[self.world.index(i) - 1].y)
+                        self.world[i-1][j].id = 2
+                    if i < self.height - 1 and self.world[i+1][j].id == 3:
+                        #self.world[self.world.index(i) + 1] = Block(2, self.world[self.world.index(i) + 1].x,self.world[self.world.index(i) + 1].y)
+                        self.world[i + 1][j].id = 2
+                    if j > 0 and self.world[i][j-1].id == 3:
+                        #self.world[self.world.index(i) - self.width] = Block(2, self.world[self.world.index(i) - self.width].x, self.world[self.world.index(i) - self.width].y)
+                        self.world[i][j - 1].id = 2
+                    if j < self.width - 1 and self.world[i][j+1].id == 3:
+                        #self.world[self.world.index(i) + self.width] = Block(2, self.world[self.world.index(i) + self.width].x, self.world[self.world.index(i) + self.width].y)
+                        self.world[i][j + 1].id = 2
+
+        # Build on sand - Add 2 or 3 block of sand around water
+
+
+
+    def generateguiold(self):
         start_time = time.time()
         # Generate Grass
         for i in range(self.height):
@@ -116,9 +189,8 @@ class WorldGenerator:
         # Build on sand - Add 2 or 3 block of sand around water
 
 
-
     def get_world(self):
-        print(self.world)
+        #print(self.world)
         return self.world
 
 

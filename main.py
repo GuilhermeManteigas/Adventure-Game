@@ -27,7 +27,7 @@ playing = True
 # The clock will be used to control how fast the screen updates
 clock = pygame.time.Clock()
 # Player declaration
-player = Player(50, 50)
+player = Player(1000, 1000)
 
 # Define some colors
 BLACK = (0, 0, 0)
@@ -35,6 +35,7 @@ WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 
+world_size = 100
 world = WorldGenerator(100, 100).get_world()
 world_section = []
 Cube_Size = 30
@@ -59,15 +60,19 @@ image_resources = load_image_resources()
 
 def update_world_section():
     global world_section
-    radiusx = 2000
-    radiusy = 1000
     while True:
+        #start_time = time.time()
         temp_world = []
-        for i in world:
-            if abs(player.x - i.x*Cube_Size) < radiusx and abs(player.y - i.y*Cube_Size) < radiusy:
-                temp_world.append(i)
+
+        for i in range(int(player.y/30) - 30, int(player.y/30) + 30):
+            for j in range(int(player.x/30) - 30, int(player.x/30) + 30):
+                if 0 < i < world_size - 1 and 0 < j < world_size - 1:
+                    temp_world.append(world[i][j])
+
         world_section = temp_world[:]
+        #print("--- %s seconds ---" % (time.time() - start_time))
         time.sleep(Game_Tick*5)
+
 
 def draw_world():
     screen_width, screen_height = screen.get_size()
