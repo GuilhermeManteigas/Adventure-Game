@@ -27,7 +27,7 @@ playing = True
 # The clock will be used to control how fast the screen updates
 clock = pygame.time.Clock()
 # Player declaration
-player = Player(1000, 1000)
+player = Player(500, 500)
 
 # Define some colors
 BLACK = (0, 0, 0)
@@ -36,7 +36,7 @@ GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 
 world_size = 100
-world = WorldGenerator(100, 100).get_world()
+world = WorldGenerator(world_size, world_size).get_world()
 world_section = []
 Cube_Size = 30
 scroll = [0, 0]
@@ -45,13 +45,18 @@ true_scroll = [0, 0]
 
 def load_image_resources():
     ############### Blocks ##############################
-    images = []
+    images = [None] * 500
     ########## index 0 reserved for future use ##########
-    images.append(pygame.image.load('dirt.png').convert())
+    #images.append(pygame.image.load('dirt.png').convert())
     #####################################################
-    images.append(pygame.image.load('grass.png').convert())  # id = 1
-    images.append(pygame.image.load('sand.png').convert())  # id = 2
-    images.append(pygame.image.load('water.png').convert())  # id = 3
+    images[1] = pygame.image.load('grass.png').convert()
+    images[2] = pygame.image.load('sand.png').convert()
+    images[3] = pygame.image.load('water.png').convert()
+    images[69] = pygame.image.load('test.png').convert()
+
+    ############### Entities ##############################
+    images[100] = pygame.image.load('tree.png').convert()
+
 
     return images
 
@@ -64,10 +69,10 @@ def update_world_section():
         #start_time = time.time()
         temp_world = []
 
-        for i in range(int(player.y/30) - 30, int(player.y/30) + 30):
-            for j in range(int(player.x/30) - 30, int(player.x/30) + 30):
-                if 0 < i < world_size - 1 and 0 < j < world_size - 1:
-                    temp_world.append(world[i][j])
+        for x in range(int(player.x / 30) - 30, int(player.x / 30) + 30):
+            for y in range(int(player.y/30) - 30, int(player.y/30) + 30):
+                if 0 < x < world_size - 1 and 0 < y < world_size - 1:
+                    temp_world.append(world[x][y])
 
         world_section = temp_world[:]
         #print("--- %s seconds ---" % (time.time() - start_time))
@@ -76,13 +81,35 @@ def update_world_section():
 
 def draw_world():
     screen_width, screen_height = screen.get_size()
-    counter = 0
     for idx, i in enumerate(world_section):
         if (player.x - (screen_width/2)) - Cube_Size * 5 < i.x * Cube_Size < (player.x + (screen_width/2)) + Cube_Size * 5 and (player.y - (screen_height/2)) - Cube_Size * 5 < i.y * Cube_Size < (player.y + (screen_height/2)) + Cube_Size * 5:
             if i.id != 0:
                 screen.blit(image_resources[i.id], (i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1]))
+                i.hitbox = pygame.Rect((i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1]),(Cube_Size, Cube_Size))
+                #if i.id == 3:
+                    #pygame.draw.rect(screen, GREEN, i.hitbox, 1)
+            #if i.entity != 0:
+                #screen.blit(image_resources[i.entity], (i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1]))
 
-        counter = idx
+
+def draw_entities():
+    screen_width, screen_height = screen.get_size()
+    for idx, i in enumerate(world_section):
+        if (player.x - (screen_width/2)) - Cube_Size * 5 < i.x * Cube_Size < (player.x + (screen_width/2)) + Cube_Size * 5 and (player.y - (screen_height/2)) - Cube_Size * 5 < i.y * Cube_Size < (player.y + (screen_height/2)) + Cube_Size * 5:
+            if i.entity.id != 0:
+                screen.blit(image_resources[i.entity.id], (i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1] - image_resources[i.entity.id].get_height() + Cube_Size))
+                i.entity.hitbox = pygame.Rect((i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1]), (Cube_Size, Cube_Size))
+                #pygame.draw.rect(screen, GREEN, i.entity.hitbox, 1)
+                #recti = pygame.Rect((x, y), (Cube_Size, Cube_Size))
+                #recti.center = x - scroll[0], y - scroll[1]
+                #pygame.draw.rect(screen, RED, i.entity.hitbox, 1)
+
+                #image_resources[i.entity].get_height()
+                #screen.blit(image_resources[i.entity], (i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1]))
+
+            #if (player.x - (screen_width / 2)) - Cube_Size * 5 < i.x * Cube_Size < (player.x + (screen_width / 2)) + Cube_Size * 5
+                #and
+                #(player.y - (screen_height / 2)) - Cube_Size * 5 < i.y * Cube_Size < (player.y + (screen_height / 2)) + Cube_Size * 5:
 
 
 def show_fps(window, clock):
@@ -90,19 +117,79 @@ def show_fps(window, clock):
     black = pygame.Color("black")
     fps_overlay = FPS_FONT.render(str(int(clock.get_fps())), True, black)
     window.blit(fps_overlay, (0, 0))
+    # Coords on screen
+    coors_overlay = FPS_FONT.render(str((int(player.x / Cube_Size), int(player.y / Cube_Size))), True, black)
+    window.blit(coors_overlay, (0, 20))
+    #world[int(player.y / Cube_Size)+1][int(player.x / Cube_Size)+1].id = 69
+
+def collision_checker(x, y):
+    #blocks_around = []
+    #blocks_around.append(world[(int(player.x / Cube_Size)+1) - 1][(int(player.y / Cube_Size)+1)])
+    #blocks_around.append(world[(int(player.x / Cube_Size) + 1) + 1][(int(player.y / Cube_Size) + 1)])
+    #blocks_around.append(world[(int(player.x / Cube_Size) + 1)][(int(player.y / Cube_Size) + 1) - 1])
+    #blocks_around.append(world[(int(player.x / Cube_Size) + 1)][(int(player.y / Cube_Size) + 1) + 1])
+
+    #blocks_around.append(world[(int(player.x / Cube_Size) + 1) - 1][(int(player.y / Cube_Size) + 1) - 1])
+    #blocks_around.append(world[(int(player.x / Cube_Size) + 1) - 1][(int(player.y / Cube_Size) + 1) + 1])
+    #blocks_around.append(world[(int(player.x / Cube_Size) + 1) + 1][(int(player.y / Cube_Size) + 1) - 1])
+    #blocks_around.append(world[(int(player.x / Cube_Size) + 1) + 1][(int(player.y / Cube_Size) + 1) + 1])
+
+    ## More efficient with if before every block append! i think!
+    #for i in blocks_around:
+    #    if not i.collision and not i.entity.collision:
+    #        blocks_around.remove(i)
+
+
+
+
+    if world[int(x/30)+1][int(y/30)+1].collision or world[int(x/30)+1][int(y/30)+1].entity.collision:
+        if world[int(x/30)+1][int(y/30)+1].entity.hitbox == 0:
+            recti = world[int(x / 30) + 1][int(y / 30) + 1].hitbox
+        else:
+            recti = world[int(x / 30) + 1][int(y / 30) + 1].entity.hitbox
+        pygame.draw.rect(screen, GREEN, recti, 1)
+        #recti = pygame.Rect((x, y), (Cube_Size, Cube_Size))
+        #recti.center = x - scroll[0], y - scroll[1]
+        #pygame.draw.rect(screen, GREEN, recti, 1)
+        #pygame.draw.rect(screen, (0, 0, 255), (x, y, Cube_Size, Cube_Size), 0)
+        #rectp = pygame.Rect((player.x, player.y), (Cube_Size+20, Cube_Size+20))
+        rectp = player.image.get_rect()
+        pygame.draw.rect(screen, RED, rectp, 1)
+        #pygame.draw.rect(screen, RED, rectp, 1)
+        #pygame.draw.rect(screen, (0, 255, 0), (player.x, player.y, Cube_Size, Cube_Size), 0)
+        if rectp.colliderect(recti):
+    #if world[int(player.x / Cube_Size)+1][int(player.y / Cube_Size)+1].entity.collision:
+            world[int(player.x / Cube_Size)+1][int(player.y / Cube_Size)+1].id = 69
+            print("colided")
+        #recti = pygame.Rect((x, y), (x + Cube_Size, y + Cube_Size))
+        #rectp = pygame.Rect((player.x, player.y), (player.x + Cube_Size, player.y + Cube_Size))
+        #if rectp.colliderect(recti):
+            #print("colided")
+            #print(int(player.x / Cube_Size),int(player.y / Cube_Size))
+            #print(world[int(player.x / Cube_Size)][int(player.y / Cube_Size)].id)
+            #print(world[int(player.x / Cube_Size)][int(player.y / Cube_Size)].x, world[int(player.x / Cube_Size)][int(player.y / Cube_Size)].y)
+        #else:
+            #player.move(x, y)
+    else:
+        player.move(x, y)
+
 
 
 def player_movement_handler():
     while game_running:
         keys = pygame.key.get_pressed()
         if keys[pygame.K_a]:
-            player.move(player.x - player.speed, player.y)
+            collision_checker(player.x - player.speed, player.y)
+            #player.move(player.x - player.speed, player.y)
         elif keys[pygame.K_d]:
-            player.move(player.x + player.speed, player.y)
+            collision_checker(player.x + player.speed, player.y)
+            #player.move(player.x + player.speed, player.y)
         if keys[pygame.K_w]:
-            player.move(player.x, player.y - player.speed)
+            collision_checker(player.x, player.y - player.speed)
+            #player.move(player.x, player.y - player.speed)
         if keys[pygame.K_s]:
-            player.move(player.x, player.y + player.speed)
+            collision_checker(player.x, player.y + player.speed)
+            #player.move(player.x, player.y + player.speed)
 
         time.sleep(Game_Tick/15)
 
@@ -141,8 +228,14 @@ while playing:
     scroll[1] = int(scroll[1])
 
     draw_world()
+    draw_entities()
 
-    screen.blit(player.image, (player.x - scroll[0], player.y - scroll[1]))
+    rect = player.image.get_rect()
+    rect.center = player.x - scroll[0], player.y - scroll[1]
+    player.hitbox = pygame.Rect(rect)
+    screen.blit(player.image, rect)
+    pygame.draw.rect(screen, RED, rect, 1)
+    #screen.blit(player.image, (player.x - scroll[0], player.y - scroll[1]))
     show_fps(screen, clock)
 
 

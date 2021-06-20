@@ -18,6 +18,7 @@ class Player(pygame.sprite.Sprite):
         self.images_left = []
         self.load_sprites()
         self.image = self.images_idle[self.index]
+        self.hitbox = 0
 
 
         player_movement = threading.Thread(target=self.idle)
