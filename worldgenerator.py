@@ -37,20 +37,20 @@ class WorldGenerator:
                 for j in range(self.width):
                     if self.world[i][j].id == 3:
                         if random.randint(0, c) == 1 and j > 0:
-                            self.world[i][j-1].id = 3
+                            self.world[i][j - 1].id = 3
                             self.world[i][j - 1].collision = True
                             #self.world[self.world.index(i)-1] = Block(3, self.world[self.world.index(i)-1].x, self.world[self.world.index(i)-1].y)
                         if random.randint(0, c) == 1 and j < self.width - 1:
                             self.world[i][j + 1].id = 3
-                            self.world[i][j - 1].collision = True
+                            self.world[i][j + 1].collision = True
                             #self.world[self.world.index(i)+1] = Block(3, self.world[self.world.index(i)+1].x, self.world[self.world.index(i) + 1].y)
                         if random.randint(0, c) == 1 and i > 0:
                             self.world[i-1][j].id = 3
-                            self.world[i][j - 1].collision = True
+                            self.world[i-1][j].collision = True
                             #self.world[self.world.index(i)-self.width] = Block(3, self.world[self.world.index(i)-self.width].x, self.world[self.world.index(i) - self.width].y)
                         if random.randint(0, c) == 1 and i < self.height - 1:
                             self.world[i + 1][j].id = 3
-                            self.world[i][j - 1].collision = True
+                            self.world[i + 1][j].collision = True
                             #self.world[self.world.index(i)+self.width] = Block(3, self.world[self.world.index(i)+self.width].x, self.world[self.world.index(i) + self.width].y)
         print("--- Generate Lakes: %s seconds ---" % (time.time() - start_time))
 
@@ -62,6 +62,7 @@ class WorldGenerator:
                     if j > 0 and j < self.width - 1 and i > 0 and i < self.height - 1:
                         if self.world[i+1][j].id == 3 and self.world[i-1][j].id == 3 and self.world[i][j+1].id == 3 and self.world[i][j-1].id == 3:
                             self.world[i][j].id = 3
+                            self.world[i][j].collision = True
         print("--- Remove single block islands: %s seconds ---" % (time.time() - start_time))
 
         # Generate sand
@@ -104,6 +105,9 @@ class WorldGenerator:
         start_time = time.time()
 
         self.world[1][1].entity = Entity(100, True)
+        self.world[0][0].id = 69
+        #self.world[1][1].id = 69
+        self.world[2][2].id = 69
 
 
 

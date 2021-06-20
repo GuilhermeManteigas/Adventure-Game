@@ -71,7 +71,7 @@ def update_world_section():
 
         for x in range(int(player.x / 30) - 30, int(player.x / 30) + 30):
             for y in range(int(player.y/30) - 30, int(player.y/30) + 30):
-                if 0 < x < world_size - 1 and 0 < y < world_size - 1:
+                if 0 <= x < world_size - 1 and 0 <= y < world_size - 1:
                     temp_world.append(world[x][y])
 
         world_section = temp_world[:]
@@ -84,8 +84,9 @@ def draw_world():
     for idx, i in enumerate(world_section):
         if (player.x - (screen_width/2)) - Cube_Size * 5 < i.x * Cube_Size < (player.x + (screen_width/2)) + Cube_Size * 5 and (player.y - (screen_height/2)) - Cube_Size * 5 < i.y * Cube_Size < (player.y + (screen_height/2)) + Cube_Size * 5:
             if i.id != 0:
-                screen.blit(image_resources[i.id], (i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1]))
+                screen.blit(image_resources[i.id], (i.x * Cube_Size - scroll[0] , i.y * Cube_Size - scroll[1] ))
                 i.hitbox = pygame.Rect((i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1]),(Cube_Size, Cube_Size))
+                #pygame.draw.rect(screen, BLACK, (i.x * Cube_Size - scroll[0],i.y * Cube_Size - scroll[1], 10, 10))
                 #if i.id == 3:
                     #pygame.draw.rect(screen, GREEN, i.hitbox, 1)
             #if i.entity != 0:
@@ -96,6 +97,7 @@ def draw_entities():
     screen_width, screen_height = screen.get_size()
     for idx, i in enumerate(world_section):
         if (player.x - (screen_width/2)) - Cube_Size * 5 < i.x * Cube_Size < (player.x + (screen_width/2)) + Cube_Size * 5 and (player.y - (screen_height/2)) - Cube_Size * 5 < i.y * Cube_Size < (player.y + (screen_height/2)) + Cube_Size * 5:
+        #if(player.x - (screen_width / 2)) - Cube_Size * 5 < i.x * Cube_Size < (player.x + (screen_width / 2)) + Cube_Size * 5 and (player.y - (screen_height / 2)) - Cube_Size * 5 < i.y * Cube_Size < (player.y + (screen_height / 2)) + Cube_Size * 5:
             if i.entity.id != 0:
                 screen.blit(image_resources[i.entity.id], (i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1] - image_resources[i.entity.id].get_height() + Cube_Size))
                 i.entity.hitbox = pygame.Rect((i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1]), (Cube_Size, Cube_Size))
@@ -121,6 +123,10 @@ def show_fps(window, clock):
     coors_overlay = FPS_FONT.render(str((int(player.x / Cube_Size), int(player.y / Cube_Size))), True, black)
     window.blit(coors_overlay, (0, 20))
     #world[int(player.y / Cube_Size)+1][int(player.x / Cube_Size)+1].id = 69
+    coors_overlay = FPS_FONT.render(str((player.x / Cube_Size, player.y / Cube_Size)), True, black)
+    window.blit(coors_overlay, (0, 40))
+    coors_overlay = FPS_FONT.render(str((player.x, player.y)), True, black)
+    window.blit(coors_overlay, (0, 60))
 
 def collision_checker(x, y):
     #blocks_around = []
@@ -139,39 +145,35 @@ def collision_checker(x, y):
     #    if not i.collision and not i.entity.collision:
     #        blocks_around.remove(i)
 
+    print("===============================")
+    print("Checking ", int(x / 30), int(y / 30))
+    print(world[int(x / 30)][int(y / 30)].x, world[int(x / 30)][int(y / 30)].y, world[int(x / 30)][int(y / 30)].id,
+          world[int(x / 30)][int(y / 30)].collision)
 
-
-
-    if world[int(x/30)+1][int(y/30)+1].collision or world[int(x/30)+1][int(y/30)+1].entity.collision:
-        if world[int(x/30)+1][int(y/30)+1].entity.hitbox == 0:
-            recti = world[int(x / 30) + 1][int(y / 30) + 1].hitbox
-        else:
-            recti = world[int(x / 30) + 1][int(y / 30) + 1].entity.hitbox
-        pygame.draw.rect(screen, GREEN, recti, 1)
-        #recti = pygame.Rect((x, y), (Cube_Size, Cube_Size))
-        #recti.center = x - scroll[0], y - scroll[1]
-        #pygame.draw.rect(screen, GREEN, recti, 1)
-        #pygame.draw.rect(screen, (0, 0, 255), (x, y, Cube_Size, Cube_Size), 0)
-        #rectp = pygame.Rect((player.x, player.y), (Cube_Size+20, Cube_Size+20))
-        rectp = player.image.get_rect()
-        pygame.draw.rect(screen, RED, rectp, 1)
-        #pygame.draw.rect(screen, RED, rectp, 1)
-        #pygame.draw.rect(screen, (0, 255, 0), (player.x, player.y, Cube_Size, Cube_Size), 0)
+    if world[int(x / 30)][int(y / 30)].entity.collision:
+        print("Entity Collision")
+        recti = world[int(x / 30)][int(y / 30)].entity.hitbox
+        rectp = player.hitbox
         if rectp.colliderect(recti):
-    #if world[int(player.x / Cube_Size)+1][int(player.y / Cube_Size)+1].entity.collision:
-            world[int(player.x / Cube_Size)+1][int(player.y / Cube_Size)+1].id = 69
+            world[int(player.x / Cube_Size)][int(player.y / Cube_Size)].id = 69
             print("colided")
-        #recti = pygame.Rect((x, y), (x + Cube_Size, y + Cube_Size))
-        #rectp = pygame.Rect((player.x, player.y), (player.x + Cube_Size, player.y + Cube_Size))
-        #if rectp.colliderect(recti):
-            #print("colided")
-            #print(int(player.x / Cube_Size),int(player.y / Cube_Size))
-            #print(world[int(player.x / Cube_Size)][int(player.y / Cube_Size)].id)
-            #print(world[int(player.x / Cube_Size)][int(player.y / Cube_Size)].x, world[int(player.x / Cube_Size)][int(player.y / Cube_Size)].y)
-        #else:
-            #player.move(x, y)
+        else:
+            player.move(x, y)
+
+    elif world[int(x/30)][int(y/30)].id == 3:#world[int(x/30)][int(y/30)].collision:
+        print("World Collision")
+        print(player.x, player.y,player.x/30, player.y/30)
+        print(int(x/30),int(y/30))
+        print(world[int(x/30)][int(y/30)].x,world[int(x/30)][int(y/30)].y,world[int(x/30)][int(y/30)].id, world[int(x / 30)][int(y / 30)].collision)
+        print(world[int(x / 30)-1][int(y / 30)].x, world[int(x / 30)-1][int(y / 30)].y, world[int(x / 30)-1][int(y / 30)].id, world[int(x / 30)-1][int(y / 30)].collision)
+        print(world[int(x / 30)-2][int(y / 30)].x, world[int(x / 30)-2][int(y / 30)].y, world[int(x / 30)-2][int(y / 30)].id, world[int(x / 30)-2][int(y / 30)].collision)
     else:
+        print("Pass")
         player.move(x, y)
+
+    print("===============================")
+
+
 
 
 
@@ -230,8 +232,9 @@ while playing:
     draw_world()
     draw_entities()
 
+    #rect = rect(0,0,100,100)
     rect = player.image.get_rect()
-    rect.center = player.x - scroll[0], player.y - scroll[1]
+    rect.center = player.x - scroll[0], player.y - scroll[1] - (player.image.get_height() - Cube_Size - 5)  #fixed the size because was messign up colisions now colision point is at feet
     player.hitbox = pygame.Rect(rect)
     screen.blit(player.image, rect)
     pygame.draw.rect(screen, RED, rect, 1)
