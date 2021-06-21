@@ -19,6 +19,10 @@ pygame.display.set_caption("Adventure Game")
 
 black = (0, 0, 0)
 
+night_value = 0
+night_filter = pygame.Surface(size)
+night_filter.fill((0, 0, 0))
+game_days = 0
 Game_Map_Size = 30
 Game_Tick = 0.1
 game_running = True
@@ -36,7 +40,7 @@ GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 
-world_size = 500
+world_size = 200
 world = WorldGenerator(world_size, world_size).get_world()
 world_section = []
 Cube_Size = 30
@@ -54,7 +58,7 @@ def load_image_resources():
     images[3] = [pygame.image.load('images/Blocks/water/water1.png').convert_alpha(),pygame.image.load('images/Blocks/water/water2.png').convert_alpha()]
 
     ############### Entities ##############################
-    images[100] = pygame.image.load('tree.png').convert()
+    images[100] = [pygame.image.load('images/Entities/tree/tree1.png').convert_alpha(), pygame.image.load('images/Entities/tree/tree2.png').convert_alpha(), pygame.image.load('images/Entities/tree/tree3.png').convert_alpha()]
 
     return images
 
@@ -94,12 +98,22 @@ def draw_world():
 
 def draw_entities():
     screen_width, screen_height = screen.get_size()
+
+    if night_value > 0:
+        night_filter.fill((night_value, night_value, night_value))
+
     for idx, i in enumerate(world_section):
         if (player.x - (screen_width/2)) - Cube_Size * 5 < i.x * Cube_Size < (player.x + (screen_width/2)) + Cube_Size * 5 and (player.y - (screen_height/2)) - Cube_Size * 5 < i.y * Cube_Size < (player.y + (screen_height/2)) + Cube_Size * 5:
         #if(player.x - (screen_width / 2)) - Cube_Size * 5 < i.x * Cube_Size < (player.x + (screen_width / 2)) + Cube_Size * 5 and (player.y - (screen_height / 2)) - Cube_Size * 5 < i.y * Cube_Size < (player.y + (screen_height / 2)) + Cube_Size * 5:
             if i.entity.id != 0:
-                screen.blit(image_resources[i.entity.id], (i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1] - image_resources[i.entity.id].get_height() + Cube_Size))
+                screen.blit(image_resources[i.entity.id][i.entity.entity_face], (i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1] - image_resources[i.entity.id][i.entity.entity_face].get_height() + Cube_Size))
                 i.entity.hitbox = pygame.Rect((i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1]), (Cube_Size, Cube_Size))
+                if night_value > 0:
+                    a, b = light.get_size()
+                    night_filter.blit(light, (i.x * Cube_Size - scroll[0] - a/2, i.y * Cube_Size - scroll[1] - b/2))
+
+    #night_filter.fill((night_value, night_value, night_value))
+    #screen.blit(night_filter, (0, 0), special_flags=pygame.BLEND_RGBA_SUB)
                 #pygame.draw.rect(screen, GREEN, i.entity.hitbox, 1)
                 #recti = pygame.Rect((x, y), (Cube_Size, Cube_Size))
                 #recti.center = x - scroll[0], y - scroll[1]
@@ -114,122 +128,113 @@ def draw_entities():
 
 
 def show_fps(window, clock):
-    FPS_FONT = pygame.font.SysFont("Verdana", 15)
-    black = pygame.Color("black")
+    FPS_FONT = pygame.font.SysFont("Verdana", 10)
+    black = pygame.Color("white")
     fps_overlay = FPS_FONT.render(str(int(clock.get_fps())), True, black)
-    window.blit(fps_overlay, (0, 0))
+    window.blit(fps_overlay, (45, 0))
     # Coords on screen
     coors_overlay = FPS_FONT.render(str((int(player.x / Cube_Size), int(player.y / Cube_Size))), True, black)
-    window.blit(coors_overlay, (0, 20))
-    #world[int(player.y / Cube_Size)+1][int(player.x / Cube_Size)+1].id = 69
-    #coors_overlay = FPS_FONT.render(str((player.x / Cube_Size, player.y / Cube_Size)), True, black)
-    #window.blit(coors_overlay, (0, 40))
-    #coors_overlay = FPS_FONT.render(str((player.x, player.y)), True, black)
-    #window.blit(coors_overlay, (0, 60))
+    window.blit(coors_overlay, (0, 0))
+
+
 
 def collision_checker(x, y):
-    #blocks_around = []
-    #blocks_around.append(world[(int(player.x / Cube_Size)+1) - 1][(int(player.y / Cube_Size)+1)])
-    #blocks_around.append(world[(int(player.x / Cube_Size) + 1) + 1][(int(player.y / Cube_Size) + 1)])
-    #blocks_around.append(world[(int(player.x / Cube_Size) + 1)][(int(player.y / Cube_Size) + 1) - 1])
-    #blocks_around.append(world[(int(player.x / Cube_Size) + 1)][(int(player.y / Cube_Size) + 1) + 1])
-
-    #blocks_around.append(world[(int(player.x / Cube_Size) + 1) - 1][(int(player.y / Cube_Size) + 1) - 1])
-    #blocks_around.append(world[(int(player.x / Cube_Size) + 1) - 1][(int(player.y / Cube_Size) + 1) + 1])
-    #blocks_around.append(world[(int(player.x / Cube_Size) + 1) + 1][(int(player.y / Cube_Size) + 1) - 1])
-    #blocks_around.append(world[(int(player.x / Cube_Size) + 1) + 1][(int(player.y / Cube_Size) + 1) + 1])
-
-    ## More efficient with if before every block append! i think!
-    #for i in blocks_around:
-    #    if not i.collision and not i.entity.collision:
-    #        blocks_around.remove(i)
-
-    #print("===============================")
-    #print("Checking ", int(x / 30), int(y / 30))
-    #print(world[int(x / 30)][int(y / 30)].x, world[int(x / 30)][int(y / 30)].y, world[int(x / 30)][int(y / 30)].id,world[int(x / 30)][int(y / 30)].collision)
 
     if world[int(x / 30)][int(y / 30)].entity.collision:
         pass
-        #print("Entity Collision")
-        #recti = world[int(x / 30)][int(y / 30)].entity.hitbox
-        #rectp = player.hitbox
-        #if rectp.colliderect(recti):
-            #world[int(player.x / Cube_Size)][int(player.y / Cube_Size)].id = 69
-            #print("colided")
-        #else:
-            #player.move(x, y)
-
     elif world[int(x/30)][int(y/30)].collision:
         pass
     elif int(x/30) < 25 or int(y/30) < 20 or int(x/30) > world_size - 25 or int(y/30) > world_size - 20:
         pass
     else:
-        #print("Pass")
         player.move(x, y)
 
-    #print("===============================")
 
 def block_face_checker():
-    #MAKE IT RUN ONLY AT THE BEGGINING OF THE GAME
+    for x in range(world_size-1):
+        for y in range(world_size-1):
+            if world[x][y].height == 1:
+
+                #   O X O    O O O
+                #   X B X    O B O
+                #   O X O    O O O
+                if world[x][y - 1].height == 1 and world[x - 1][y].height == 1 and world[x + 1][y].height == 1 and world[x][y + 1].height == 1:
+                    world[x][y].block_face = 4
+                elif world[x][y - 1].height < 1 and world[x - 1][y].height < 1 and world[x + 1][y].height < 1 and world[x][y + 1].height < 1:
+                    world[x][y].block_face = 9
+
+                #   O X O    O X O   O X O   O O O
+                #   X B O    O B X   X B X   X B X
+                #   O X O    O X O   O O O   O X O
+                elif world[x][y - 1].height < 1 and world[x - 1][y].height < 1 and world[x][y + 1].height < 1:
+                    world[x][y].block_face = 10
+                elif world[x][y - 1].height < 1 and world[x + 1][y].height < 1 and world[x][y + 1].height < 1:
+                    world[x][y].block_face = 11
+                elif world[x][y - 1].height < 1 and world[x - 1][y].height < 1 and world[x + 1][y].height < 1:
+                    world[x][y].block_face = 12
+                elif world[x][y + 1].height < 1 and world[x - 1][y].height < 1 and world[x + 1][y].height < 1:
+                    world[x][y].block_face = 13
+
+                #   O X O    O X O   O O O   O O O   O X O   O O O
+                #   X B O    O B X   X B O   O B X   O B O   X B X
+                #   O O O    O O O   O X O   O X O   O X O   O O O
+                elif world[x][y - 1].height < 1 and world[x - 1][y].height < 1:
+                    world[x][y].block_face = 0
+                elif world[x][y - 1].height < 1 and world[x + 1][y].height < 1:
+                    world[x][y].block_face = 2
+                elif world[x][y + 1].height < 1 and world[x - 1][y].height < 1:
+                    world[x][y].block_face = 6
+                elif world[x][y + 1].height < 1 and world[x + 1][y].height < 1:
+                    world[x][y].block_face = 8
+                elif world[x][y - 1].height < 1 and world[x][y + 1].height < 1:
+                    world[x][y].block_face = 14
+                elif world[x - 1][y].height < 1 and world[x + 1][y].height < 1:
+                    world[x][y].block_face = 15
+
+                #   O X O    O O O   O O O   O O O
+                #   O B O    X B O   O B X   O B O
+                #   O O O    O O O   O O O   O X O
+                elif world[x][y - 1].height < 1:
+                    world[x][y].block_face = 1
+                elif world[x - 1][y].height < 1:
+                    world[x][y].block_face = 3
+                elif world[x + 1][y].height < 1:
+                    world[x][y].block_face = 5
+                elif world[x][y + 1].height < 1:
+                    world[x][y].block_face = 7
+
+            #Liquid Blocks
+            elif world[x][y].height == 0:
+                if world[x][y - 1].height == 1:
+                    world[x][y].block_face = 1
+                else:
+                    world[x][y].block_face = 0
+
+
+def time_handler():
+    # 24 H = 1440 Min ==> a in game day will take 24 min
+    # 6 AM Morning & 10 PM Night
+    timer = 1300#420 # 7 AM
+    global night_value
+    global game_days
     while game_running:
-        for x in range(world_size-1):
-            for y in range(world_size-1):
-                if world[x][y].height == 1:
+        if timer >= 1440:
+            game_days += 1
+            timer = 0
+        elif 1320 < timer < 1380:
+            night_value += 2
+            #night_filter.fill((night_value, night_value, night_value))
+            #night_filter.set_alpha(night_value)  # alpha level
+        elif 360 < timer < 420:
+            night_value -= 2
+            #night_filter.fill((night_value, night_value, night_value))
+            #night_filter.set_alpha(night_value)
 
-                    #   O X O    O O O
-                    #   X B X    O B O
-                    #   O X O    O O O
-                    if world[x][y - 1].height == 1 and world[x - 1][y].height == 1 and world[x + 1][y].height == 1 and world[x][y + 1].height == 1:
-                        world[x][y].block_face = 4
-                    elif world[x][y - 1].height < 1 and world[x - 1][y].height < 1 and world[x + 1][y].height < 1 and world[x][y + 1].height < 1:
-                        world[x][y].block_face = 9
+        #night_filter.fill((night_value, night_value, night_value))
 
-                    #   O X O    O X O   O X O   O O O
-                    #   X B O    O B X   X B X   X B X
-                    #   O X O    O X O   O O O   O X O
-                    elif world[x][y - 1].height < 1 and world[x - 1][y].height < 1 and world[x][y + 1].height < 1:
-                        world[x][y].block_face = 10
-                    elif world[x][y - 1].height < 1 and world[x + 1][y].height < 1 and world[x][y + 1].height < 1:
-                        world[x][y].block_face = 11
-                    elif world[x][y - 1].height < 1 and world[x - 1][y].height < 1 and world[x + 1][y].height < 1:
-                        world[x][y].block_face = 12
-                    elif world[x][y + 1].height < 1 and world[x - 1][y].height < 1 and world[x + 1][y].height < 1:
-                        world[x][y].block_face = 13
-
-                    #   O X O    O X O   O O O   O O O   O X O   O O O
-                    #   X B O    O B X   X B O   O B X   O B O   X B X
-                    #   O O O    O O O   O X O   O X O   O X O   O O O
-                    elif world[x][y - 1].height < 1 and world[x - 1][y].height < 1:
-                        world[x][y].block_face = 0
-                    elif world[x][y - 1].height < 1 and world[x + 1][y].height < 1:
-                        world[x][y].block_face = 2
-                    elif world[x][y + 1].height < 1 and world[x - 1][y].height < 1:
-                        world[x][y].block_face = 6
-                    elif world[x][y + 1].height < 1 and world[x + 1][y].height < 1:
-                        world[x][y].block_face = 8
-                    elif world[x][y - 1].height < 1 and world[x][y + 1].height < 1:
-                        world[x][y].block_face = 14
-                    elif world[x - 1][y].height < 1 and world[x + 1][y].height < 1:
-                        world[x][y].block_face = 15
-
-                    elif world[x][y - 1].height < 1:
-                        world[x][y].block_face = 1
-                    elif world[x - 1][y].height < 1:
-                        world[x][y].block_face = 3
-                    elif world[x + 1][y].height < 1:
-                        world[x][y].block_face = 5
-                    elif world[x][y + 1].height < 1:
-                        world[x][y].block_face = 7
-
-                elif world[x][y].height == 0:
-                    if world[x][y - 1].height == 0 and world[x - 1][y].height == 0 and world[x + 1][y].height == 0 and world[x][y + 1].height == 0:
-                        world[x][y].block_face = 0
-                    else:
-                        world[x][y].block_face = 1
-
+        timer += 1
 
         time.sleep(1)
-
 
 
 def player_movement_handler():
@@ -250,14 +255,17 @@ def player_movement_handler():
 player_movement = threading.Thread(target=player_movement_handler)
 player_movement.start()
 
-block_checker = threading.Thread(target=block_face_checker)
-block_checker.start()
-
 update_visible_world = threading.Thread(target=update_world_section)
 update_visible_world.start()
 
+time_handler = threading.Thread(target=time_handler)
+time_handler.start()
 
 
+block_face_checker()
+
+
+light = pygame.image.load('circle2.png').convert_alpha()
 
 #pygame.display.toggle_fullscreen()
 
@@ -276,25 +284,42 @@ while playing:
 
     #screen.fill(BLUE)
 
+    start_time = time.time()
     screen_width, screen_height = screen.get_size()
     true_scroll[0] += (player.x - true_scroll[0] - (screen_width / 2)) / 20
     true_scroll[1] += (player.y - true_scroll[1] - (screen_height / 2)) / 20
     scroll = true_scroll.copy()
     scroll[0] = int(scroll[0])
     scroll[1] = int(scroll[1])
+    print("--- A: %s seconds ---" % (time.time() - start_time))
 
+    start_time = time.time()
     draw_world()
+    print("--- Draw World: %s seconds ---" % (time.time() - start_time))
+    start_time = time.time()
     draw_entities()
+    print("--- Draw Entities: %s seconds ---" % (time.time() - start_time))
 
+    start_time = time.time()
     rect = player.image.get_rect()
     rect.center = player.x - scroll[0], player.y - scroll[1] - (player.image.get_height() - Cube_Size - 5)  #fixed the size because was messign up colisions now colision point is at feet
     player.hitbox = pygame.Rect(rect)
     screen.blit(player.image, rect)
     pygame.draw.rect(screen, RED, rect, 1)
+    print("--- Player: %s seconds ---" % (time.time() - start_time))
     #screen.blit(player.image, (player.x - scroll[0], player.y - scroll[1]))
+    start_time = time.time()
     show_fps(screen, clock)
+    print("--- FPS: %s seconds ---" % (time.time() - start_time))
 
+    if night_value > 0:
+        start_time = time.time()
 
+        #night_filter.blit(light, (230, 30))
+        #night_filter.blit(light, (330, 30))
+        screen.blit(night_filter, (0, 0), special_flags=pygame.BLEND_RGBA_SUB)
+
+        print("--- Night: %s seconds ---" % (time.time() - start_time))
 
     pygame.display.flip()
 
