@@ -19,7 +19,19 @@ class WorldGenerator:
         print("--- Generate grass: %s seconds ---" % (time.time() - start_time))
         start_time = time.time()
 
+        # Generate Ocean
+        start_time = time.time()
+        for i in range(self.height):
+            for j in range(self.width):
+                if i < 25 or j < 25 or i > self.height - 25 or j > self.width - 25:
+                    self.world[i][j].id = 3
+                    self.world[i][j].collision = True
+                    self.world[i][j].height = 0
+        print("--- Generated Ocean: %s seconds ---" % (time.time() - start_time))
+
+
         # Generate water
+        start_time = time.time()
         for i in range(self.height):
             for j in range(self.width):
                 if random.randint(0, 1200) == 1:
@@ -27,30 +39,36 @@ class WorldGenerator:
                         for x in range(j, j + 10):
                             if 0 < y < self.height - 1 and 0 < x < self.width - 1:
                                 self.world[y][x].id = 3
-                                self.world[i][j - 1].collision = True
+                                self.world[y][x].collision = True
+                                self.world[y][x].height = 0
         print("--- Generate water: %s seconds ---" % (time.time() - start_time))
-        start_time = time.time()
+
 
         # Build on water
-        for c in range(2, 10):
+        start_time = time.time()
+        for c in range(2, 8):
             for i in range(self.height):
                 for j in range(self.width):
                     if self.world[i][j].id == 3:
                         if random.randint(0, c) == 1 and j > 0:
                             self.world[i][j - 1].id = 3
                             self.world[i][j - 1].collision = True
+                            self.world[i][j - 1].height = 0
                             #self.world[self.world.index(i)-1] = Block(3, self.world[self.world.index(i)-1].x, self.world[self.world.index(i)-1].y)
                         if random.randint(0, c) == 1 and j < self.width - 1:
                             self.world[i][j + 1].id = 3
                             self.world[i][j + 1].collision = True
+                            self.world[i][j + 1].height = 0
                             #self.world[self.world.index(i)+1] = Block(3, self.world[self.world.index(i)+1].x, self.world[self.world.index(i) + 1].y)
                         if random.randint(0, c) == 1 and i > 0:
-                            self.world[i-1][j].id = 3
-                            self.world[i-1][j].collision = True
+                            self.world[i - 1][j].id = 3
+                            self.world[i - 1][j].collision = True
+                            self.world[i - 1][j].height = 0
                             #self.world[self.world.index(i)-self.width] = Block(3, self.world[self.world.index(i)-self.width].x, self.world[self.world.index(i) - self.width].y)
                         if random.randint(0, c) == 1 and i < self.height - 1:
                             self.world[i + 1][j].id = 3
                             self.world[i + 1][j].collision = True
+                            self.world[i + 1][j].height = 0
                             #self.world[self.world.index(i)+self.width] = Block(3, self.world[self.world.index(i)+self.width].x, self.world[self.world.index(i) + self.width].y)
         print("--- Generate Lakes: %s seconds ---" % (time.time() - start_time))
 
@@ -63,37 +81,38 @@ class WorldGenerator:
                         if self.world[i+1][j].id == 3 and self.world[i-1][j].id == 3 and self.world[i][j+1].id == 3 and self.world[i][j-1].id == 3:
                             self.world[i][j].id = 3
                             self.world[i][j].collision = True
+                            self.world[i][j].height = 0
         print("--- Remove single block islands: %s seconds ---" % (time.time() - start_time))
 
         # Generate sand
         start_time = time.time()
-        for i in range(self.height):
-            for j in range(self.width):
-                if self.world[i][j].id == 3:
-                    if i > 0 and self.world[i - 1][j].id == 1:
-                        self.world[i - 1][j].id = 2
-                    if i < self.height - 1 and self.world[i + 1][j].id == 1:
-                        self.world[i + 1][j].id = 2
-                    if j > 0 and self.world[i][j - 1].id == 1:
-                        self.world[i][j - 1].id = 2
-                    if j < self.width - 1 and self.world[i][j + 1].id == 1:
-                        self.world[i][j + 1].id = 2
+        #for i in range(self.height):
+            #for j in range(self.width):
+                #if self.world[i][j].id == 3:
+                    #if i > 0 and self.world[i - 1][j].id == 1:
+                    #    self.world[i - 1][j].id = 2
+                    #if i < self.height - 1 and self.world[i + 1][j].id == 1:
+                    #    self.world[i + 1][j].id = 2
+                    #if j > 0 and self.world[i][j - 1].id == 1:
+                    #    self.world[i][j - 1].id = 2
+                    #if j < self.width - 1 and self.world[i][j + 1].id == 1:
+                    #    self.world[i][j + 1].id = 2
         print("--- Generate sand: %s seconds ---" % (time.time() - start_time))
 
         # Build on sand - Add 2 or 3 block of sand around water
         start_time = time.time()
-        for c in range(2, 5):
-            for i in range(self.height):
-                for j in range(self.width):
-                    if self.world[i][j].id == 2:
-                        if random.randint(0, c) == 1 and i > 0 and self.world[i - 1][j].id == 1:
-                            self.world[i - 1][j].id = 2
-                        if random.randint(0, c) == 1 and i < self.height - 1 and self.world[i + 1][j].id == 1:
-                            self.world[i + 1][j].id = 2
-                        if random.randint(0, c) == 1 and j > 0 and self.world[i][j - 1].id == 1:
-                            self.world[i][j - 1].id = 2
-                        if random.randint(0, c) == 1 and j < self.width - 1 and self.world[i][j + 1].id == 1:
-                            self.world[i][j + 1].id = 2
+        #for c in range(2, 5):
+            #for i in range(self.height):
+                #for j in range(self.width):
+                    #if self.world[i][j].id == 2:
+                        #if random.randint(0, c) == 1 and i > 0 and self.world[i - 1][j].id == 1:
+                        #    self.world[i - 1][j].id = 2
+                        #if random.randint(0, c) == 1 and i < self.height - 1 and self.world[i + 1][j].id == 1:
+                        #    self.world[i + 1][j].id = 2
+                        #if random.randint(0, c) == 1 and j > 0 and self.world[i][j - 1].id == 1:
+                        #    self.world[i][j - 1].id = 2
+                        #if random.randint(0, c) == 1 and j < self.width - 1 and self.world[i][j + 1].id == 1:
+                        #    self.world[i][j + 1].id = 2
         print("--- Expand sand: %s seconds ---" % (time.time() - start_time))
 
         # Generate Trees
