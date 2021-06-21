@@ -34,6 +34,7 @@ BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
+BLUE = (0, 0, 255)
 
 world_size = 500
 world = WorldGenerator(world_size, world_size).get_world()
@@ -48,9 +49,9 @@ def load_image_resources():
     ########## index 0 reserved for future use ##########
     #images.append(pygame.image.load('dirt.png').convert())
     #####################################################
-    images[1] = [pygame.image.load('images/Blocks/grass/grass1.png').convert(), pygame.image.load('images/Blocks/grass/grass2.png').convert(), pygame.image.load('images/Blocks/grass/grass3.png').convert(), pygame.image.load('images/Blocks/grass/grass4.png').convert(), pygame.image.load('images/Blocks/grass/grass5.png').convert(), pygame.image.load('images/Blocks/grass/grass6.png').convert(), pygame.image.load('images/Blocks/grass/grass7.png').convert(), pygame.image.load('images/Blocks/grass/grass8.png').convert(), pygame.image.load('images/Blocks/grass/grass9.png').convert(), pygame.image.load('images/Blocks/grass/grass10.png').convert(), pygame.image.load('images/Blocks/grass/grass11.png').convert(), pygame.image.load('images/Blocks/grass/grass12.png').convert(), pygame.image.load('images/Blocks/grass/grass13.png').convert(), pygame.image.load('images/Blocks/grass/grass14.png').convert(), pygame.image.load('images/Blocks/grass/grass15.png').convert()]
-    images[2] = [pygame.image.load('sand.png').convert()]
-    images[3] = [pygame.image.load('water.png').convert()]
+    images[1] = [pygame.image.load('images/Blocks/grass/grass1.png').convert(), pygame.image.load('images/Blocks/grass/grass2.png').convert(), pygame.image.load('images/Blocks/grass/grass3.png').convert(), pygame.image.load('images/Blocks/grass/grass4.png').convert(), pygame.image.load('images/Blocks/grass/grass5.png').convert(), pygame.image.load('images/Blocks/grass/grass6.png').convert(), pygame.image.load('images/Blocks/grass/grass7.png').convert(), pygame.image.load('images/Blocks/grass/grass8.png').convert(), pygame.image.load('images/Blocks/grass/grass9.png').convert(), pygame.image.load('images/Blocks/grass/grass10.png').convert(), pygame.image.load('images/Blocks/grass/grass11.png').convert(), pygame.image.load('images/Blocks/grass/grass12.png').convert(), pygame.image.load('images/Blocks/grass/grass13.png').convert(), pygame.image.load('images/Blocks/grass/grass14.png').convert(), pygame.image.load('images/Blocks/grass/grass15.png').convert(), pygame.image.load('images/Blocks/grass/grass16.png').convert()]
+    images[2] = [pygame.image.load('images/Blocks/sand/sand1.png').convert(), pygame.image.load('images/Blocks/sand/sand2.png').convert(), pygame.image.load('images/Blocks/sand/sand3.png').convert(), pygame.image.load('images/Blocks/sand/sand4.png').convert(), pygame.image.load('images/Blocks/sand/sand5.png').convert(), pygame.image.load('images/Blocks/sand/sand6.png').convert(), pygame.image.load('images/Blocks/sand/sand7.png').convert(), pygame.image.load('images/Blocks/sand/sand8.png').convert(), pygame.image.load('images/Blocks/sand/sand9.png').convert(), pygame.image.load('images/Blocks/sand/sand10.png').convert(), pygame.image.load('images/Blocks/sand/sand11.png').convert(), pygame.image.load('images/Blocks/sand/sand12.png').convert(), pygame.image.load('images/Blocks/sand/sand13.png').convert(), pygame.image.load('images/Blocks/sand/sand14.png').convert(), pygame.image.load('images/Blocks/sand/sand15.png').convert(), pygame.image.load('images/Blocks/sand/sand16.png').convert()]
+    images[3] = [pygame.image.load('images/Blocks/water/water1.png').convert_alpha(),pygame.image.load('images/Blocks/water/water2.png').convert_alpha()]
 
     ############### Entities ##############################
     images[100] = pygame.image.load('tree.png').convert()
@@ -171,9 +172,9 @@ def collision_checker(x, y):
 def block_face_checker():
     #MAKE IT RUN ONLY AT THE BEGGINING OF THE GAME
     while game_running:
-        for x in range(world_size):
-            for y in range(world_size):
-                if world[x][y].id == 1:
+        for x in range(world_size-1):
+            for y in range(world_size-1):
+                if world[x][y].height == 1:
 
                     #   O X O    O O O
                     #   X B X    O B O
@@ -195,9 +196,9 @@ def block_face_checker():
                     elif world[x][y + 1].height < 1 and world[x - 1][y].height < 1 and world[x + 1][y].height < 1:
                         world[x][y].block_face = 13
 
-                    #   O X O    O X O   O O O   O O O   O X O
-                    #   X B O    O B X   X B O   O B X   O B O
-                    #   O O O    O O O   O X O   O X O   O X O
+                    #   O X O    O X O   O O O   O O O   O X O   O O O
+                    #   X B O    O B X   X B O   O B X   O B O   X B X
+                    #   O O O    O O O   O X O   O X O   O X O   O O O
                     elif world[x][y - 1].height < 1 and world[x - 1][y].height < 1:
                         world[x][y].block_face = 0
                     elif world[x][y - 1].height < 1 and world[x + 1][y].height < 1:
@@ -208,6 +209,8 @@ def block_face_checker():
                         world[x][y].block_face = 8
                     elif world[x][y - 1].height < 1 and world[x][y + 1].height < 1:
                         world[x][y].block_face = 14
+                    elif world[x - 1][y].height < 1 and world[x + 1][y].height < 1:
+                        world[x][y].block_face = 15
 
                     elif world[x][y - 1].height < 1:
                         world[x][y].block_face = 1
@@ -218,6 +221,11 @@ def block_face_checker():
                     elif world[x][y + 1].height < 1:
                         world[x][y].block_face = 7
 
+                elif world[x][y].height == 0:
+                    if world[x][y - 1].height == 0 and world[x - 1][y].height == 0 and world[x + 1][y].height == 0 and world[x][y + 1].height == 0:
+                        world[x][y].block_face = 0
+                    else:
+                        world[x][y].block_face = 1
 
 
         time.sleep(1)
@@ -266,7 +274,7 @@ while playing:
             else:
                 pygame.display.set_mode(size, pygame.FULLSCREEN)
 
-    screen.fill(WHITE)
+    #screen.fill(BLUE)
 
     screen_width, screen_height = screen.get_size()
     true_scroll[0] += (player.x - true_scroll[0] - (screen_width / 2)) / 20
