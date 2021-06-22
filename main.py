@@ -81,8 +81,12 @@ def update_world_section():
         #print("--- %s seconds ---" % (time.time() - start_time))
         time.sleep(Game_Tick*5)
 
-
 def draw_world():
+    for i in world_section:
+        screen.blit(image_resources[i.id][i.block_face], (i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1]))
+        #i.hitbox = pygame.Rect((i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1]), (Cube_Size, Cube_Size))
+
+def draw_worldold():
     screen_width, screen_height = screen.get_size()
     for idx, i in enumerate(world_section):
         if (player.x - (screen_width/2)) - Cube_Size * 5 < i.x * Cube_Size < (player.x + (screen_width/2)) + Cube_Size * 5 and (player.y - (screen_height/2)) - Cube_Size * 5 < i.y * Cube_Size < (player.y + (screen_height/2)) + Cube_Size * 5:
@@ -97,6 +101,24 @@ def draw_world():
 
 
 def draw_entities():
+    screen_width, screen_height = screen.get_size()
+
+    if night_value > 0:
+        night_filter.fill((night_value, night_value, night_value))
+
+    for i in world_section:
+        #if (player.x - (screen_width/2)) - Cube_Size * 5 < i.x * Cube_Size < (player.x + (screen_width/2)) + Cube_Size * 5 and (player.y - (screen_height/2)) - Cube_Size * 5 < i.y * Cube_Size < (player.y + (screen_height/2)) + Cube_Size * 5:
+        #if(player.x - (screen_width / 2)) - Cube_Size * 5 < i.x * Cube_Size < (player.x + (screen_width / 2)) + Cube_Size * 5 and (player.y - (screen_height / 2)) - Cube_Size * 5 < i.y * Cube_Size < (player.y + (screen_height / 2)) + Cube_Size * 5:
+            if i.entity.id != 0:
+                screen.blit(image_resources[i.entity.id][i.entity.entity_face], (i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1] - image_resources[i.entity.id][i.entity.entity_face].get_height() + Cube_Size))
+                i.entity.hitbox = pygame.Rect((i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1]), (Cube_Size, Cube_Size))
+                if night_value > 0:
+                    a, b = light.get_size()
+                    night_filter.blit(light, (i.x * Cube_Size - scroll[0] - a/2, i.y * Cube_Size - scroll[1] - b/2))
+
+
+
+def draw_entitiesold():
     screen_width, screen_height = screen.get_size()
 
     if night_value > 0:
@@ -129,11 +151,11 @@ def draw_entities():
 
 def show_fps(window, clock):
     FPS_FONT = pygame.font.SysFont("Verdana", 10)
-    black = pygame.Color("white")
-    fps_overlay = FPS_FONT.render(str(int(clock.get_fps())), True, black)
-    window.blit(fps_overlay, (45, 0))
+    color = pygame.Color("white")
+    fps_overlay = FPS_FONT.render(str(int(clock.get_fps())), True, color)
+    window.blit(fps_overlay, (55, 0))
     # Coords on screen
-    coors_overlay = FPS_FONT.render(str((int(player.x / Cube_Size), int(player.y / Cube_Size))), True, black)
+    coors_overlay = FPS_FONT.render(str((int(player.x / Cube_Size), int(player.y / Cube_Size))), True, color)
     window.blit(coors_overlay, (0, 0))
 
 
