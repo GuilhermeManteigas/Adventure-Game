@@ -146,8 +146,8 @@ class WorldGenerator:
             for j in range(width):
                 block = world[i][j]
                 if block.id == 1 and random.randint(0, 100) == 1:
-                    block.entity = Entity(100, True)
-                    block.entity.entity_face = 2
+                    block.entity = Entity(100, True, 2)
+                    #block.entity.entity_face = 2
         print("--- Generate Trees: %s seconds ---" % (time.time() - start_time))
         start_time = time.time()
 
@@ -282,12 +282,15 @@ class WorldGenerator:
                             self.world[i][j].height = 0
         print("--- Remove single block islands: %s seconds ---" % (time.time() - start_time))
 
+
+
+
         # Generate Trees
         for i in range(self.height):
             for j in range(self.width):
                 if self.world[i][j].id == 1 and random.randint(0, 100) == 1:
-                    self.world[i][j].entity = Entity(100, True)
-                    self.world[i][j].entity.entity_face = 2
+                    self.world[i][j].entity = Entity(100, True, 0)
+                    #self.world[i][j].entity.entity_face = 2
         print("--- Generate Trees: %s seconds ---" % (time.time() - start_time))
         start_time = time.time()
 

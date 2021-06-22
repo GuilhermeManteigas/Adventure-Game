@@ -4,6 +4,7 @@ from player import Player
 import pygame
 import threading
 import time
+from resources import Resources
 import random
 
 
@@ -47,23 +48,7 @@ Cube_Size = 30
 scroll = [0, 0]
 true_scroll = [0, 0]
 
-def load_image_resources():
-    ############### Blocks ##############################
-    images = [None] * 500
-    ########## index 0 reserved for future use ##########
-    #images.append(pygame.image.load('dirt.png').convert())
-    #####################################################
-    images[1] = [pygame.image.load('images/Blocks/grass/grass1.png').convert(), pygame.image.load('images/Blocks/grass/grass2.png').convert(), pygame.image.load('images/Blocks/grass/grass3.png').convert(), pygame.image.load('images/Blocks/grass/grass4.png').convert(), pygame.image.load('images/Blocks/grass/grass5.png').convert(), pygame.image.load('images/Blocks/grass/grass6.png').convert(), pygame.image.load('images/Blocks/grass/grass7.png').convert(), pygame.image.load('images/Blocks/grass/grass8.png').convert(), pygame.image.load('images/Blocks/grass/grass9.png').convert(), pygame.image.load('images/Blocks/grass/grass10.png').convert(), pygame.image.load('images/Blocks/grass/grass11.png').convert(), pygame.image.load('images/Blocks/grass/grass12.png').convert(), pygame.image.load('images/Blocks/grass/grass13.png').convert(), pygame.image.load('images/Blocks/grass/grass14.png').convert(), pygame.image.load('images/Blocks/grass/grass15.png').convert(), pygame.image.load('images/Blocks/grass/grass16.png').convert()]
-    images[2] = [pygame.image.load('images/Blocks/sand/sand1.png').convert(), pygame.image.load('images/Blocks/sand/sand2.png').convert(), pygame.image.load('images/Blocks/sand/sand3.png').convert(), pygame.image.load('images/Blocks/sand/sand4.png').convert(), pygame.image.load('images/Blocks/sand/sand5.png').convert(), pygame.image.load('images/Blocks/sand/sand6.png').convert(), pygame.image.load('images/Blocks/sand/sand7.png').convert(), pygame.image.load('images/Blocks/sand/sand8.png').convert(), pygame.image.load('images/Blocks/sand/sand9.png').convert(), pygame.image.load('images/Blocks/sand/sand10.png').convert(), pygame.image.load('images/Blocks/sand/sand11.png').convert(), pygame.image.load('images/Blocks/sand/sand12.png').convert(), pygame.image.load('images/Blocks/sand/sand13.png').convert(), pygame.image.load('images/Blocks/sand/sand14.png').convert(), pygame.image.load('images/Blocks/sand/sand15.png').convert(), pygame.image.load('images/Blocks/sand/sand16.png').convert()]
-    images[3] = [pygame.image.load('images/Blocks/water/water1.png').convert_alpha(),pygame.image.load('images/Blocks/water/water2.png').convert_alpha()]
-
-    ############### Entities ##############################
-    images[100] = [pygame.image.load('images/Entities/tree/tree1.png').convert_alpha(), pygame.image.load('images/Entities/tree/tree2.png').convert_alpha(), pygame.image.load('images/Entities/tree/tree3.png').convert_alpha()]
-
-    return images
-
-
-image_resources = load_image_resources()
+image_resources = Resources().get_images()
 
 
 def update_world_section():
@@ -108,6 +93,7 @@ def draw_entities():
 
     for i in world_section:
             if i.entity.id != 0:
+                i.entity.update(game_days)
                 screen.blit(image_resources[i.entity.id][i.entity.entity_face], (i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1] - image_resources[i.entity.id][i.entity.entity_face].get_height() + Cube_Size))
                 i.entity.hitbox = pygame.Rect((i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1]), (Cube_Size, Cube_Size))
                 if night_value > 0:
@@ -197,8 +183,11 @@ def block_face_checker():
                 else:
                     world[x][y].block_face = 0
 
+#def update_entities
 
 def time_handler():
+    #update_visible_world = threading.Thread(target=update_world_section)
+    #update_visible_world.start()
     # 24 H = 1440 Min ==> a in game day will take 24 min
     # 6 AM Morning & 10 PM Night
     timer = 1300#420 # 7 AM
@@ -221,7 +210,7 @@ def time_handler():
 
         timer += 1
 
-        time.sleep(1)
+        time.sleep(0.01)#time.sleep(1)
 
 
 def player_movement_handler():
