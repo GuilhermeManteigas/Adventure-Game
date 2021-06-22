@@ -40,7 +40,7 @@ GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 
-world_size = 200
+world_size = 500
 world = WorldGenerator(world_size, world_size).get_world()
 world_section = []
 Cube_Size = 30
@@ -101,52 +101,17 @@ def draw_worldold():
 
 
 def draw_entities():
-    screen_width, screen_height = screen.get_size()
+    a, b = light.get_size()
 
     if night_value > 0:
         night_filter.fill((night_value, night_value, night_value))
 
     for i in world_section:
-        #if (player.x - (screen_width/2)) - Cube_Size * 5 < i.x * Cube_Size < (player.x + (screen_width/2)) + Cube_Size * 5 and (player.y - (screen_height/2)) - Cube_Size * 5 < i.y * Cube_Size < (player.y + (screen_height/2)) + Cube_Size * 5:
-        #if(player.x - (screen_width / 2)) - Cube_Size * 5 < i.x * Cube_Size < (player.x + (screen_width / 2)) + Cube_Size * 5 and (player.y - (screen_height / 2)) - Cube_Size * 5 < i.y * Cube_Size < (player.y + (screen_height / 2)) + Cube_Size * 5:
             if i.entity.id != 0:
                 screen.blit(image_resources[i.entity.id][i.entity.entity_face], (i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1] - image_resources[i.entity.id][i.entity.entity_face].get_height() + Cube_Size))
                 i.entity.hitbox = pygame.Rect((i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1]), (Cube_Size, Cube_Size))
                 if night_value > 0:
-                    a, b = light.get_size()
                     night_filter.blit(light, (i.x * Cube_Size - scroll[0] - a/2, i.y * Cube_Size - scroll[1] - b/2))
-
-
-
-def draw_entitiesold():
-    screen_width, screen_height = screen.get_size()
-
-    if night_value > 0:
-        night_filter.fill((night_value, night_value, night_value))
-
-    for idx, i in enumerate(world_section):
-        if (player.x - (screen_width/2)) - Cube_Size * 5 < i.x * Cube_Size < (player.x + (screen_width/2)) + Cube_Size * 5 and (player.y - (screen_height/2)) - Cube_Size * 5 < i.y * Cube_Size < (player.y + (screen_height/2)) + Cube_Size * 5:
-        #if(player.x - (screen_width / 2)) - Cube_Size * 5 < i.x * Cube_Size < (player.x + (screen_width / 2)) + Cube_Size * 5 and (player.y - (screen_height / 2)) - Cube_Size * 5 < i.y * Cube_Size < (player.y + (screen_height / 2)) + Cube_Size * 5:
-            if i.entity.id != 0:
-                screen.blit(image_resources[i.entity.id][i.entity.entity_face], (i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1] - image_resources[i.entity.id][i.entity.entity_face].get_height() + Cube_Size))
-                i.entity.hitbox = pygame.Rect((i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1]), (Cube_Size, Cube_Size))
-                if night_value > 0:
-                    a, b = light.get_size()
-                    night_filter.blit(light, (i.x * Cube_Size - scroll[0] - a/2, i.y * Cube_Size - scroll[1] - b/2))
-
-    #night_filter.fill((night_value, night_value, night_value))
-    #screen.blit(night_filter, (0, 0), special_flags=pygame.BLEND_RGBA_SUB)
-                #pygame.draw.rect(screen, GREEN, i.entity.hitbox, 1)
-                #recti = pygame.Rect((x, y), (Cube_Size, Cube_Size))
-                #recti.center = x - scroll[0], y - scroll[1]
-                #pygame.draw.rect(screen, RED, i.entity.hitbox, 1)
-
-                #image_resources[i.entity].get_height()
-                #screen.blit(image_resources[i.entity], (i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1]))
-
-            #if (player.x - (screen_width / 2)) - Cube_Size * 5 < i.x * Cube_Size < (player.x + (screen_width / 2)) + Cube_Size * 5
-                #and
-                #(player.y - (screen_height / 2)) - Cube_Size * 5 < i.y * Cube_Size < (player.y + (screen_height / 2)) + Cube_Size * 5:
 
 
 def show_fps(window, clock):
