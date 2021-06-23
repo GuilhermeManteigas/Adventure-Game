@@ -8,6 +8,7 @@ from resources import Resources
 from drop import Drop
 from entity import Entity
 import random
+import itertools
 
 
 os.environ["SDL_VIDEO_CENTERED"] = "1"
@@ -133,6 +134,7 @@ def draw_entities():
 def draw_drops():
 
     for i in drop_map_section:
+        #print(i.id,i.face)
         screen.blit(image_resources[i.id][i.face], (i.x - scroll[0], i.y - scroll[1] - image_resources[i.id][i.face].get_height() + Cube_Size))
         #print(i.x,i.y)
         #screen.blit(image_resources[i.id][i.face], (i.x, i.y))
@@ -155,13 +157,26 @@ def entity_remover():
         x, y = i
         entity = world[x][y].entity
         if entity.id != 0:
-            #drop_map.append(Drop(entity.x * Cube_Size - scroll[0], entity.y * Cube_Size - scroll[1], entity.id + 100 , entity.entity_face + 1))
-            drop_map.append(Drop(entity.x * Cube_Size, entity.y * Cube_Size, entity.id + 100, entity.entity_face + 1, game_days))
+            #drop_map.append(Drop(entity.x * Cube_Size, entity.y * Cube_Size, entity.id + 100, entity.entity_face + 1, game_days))
+            #drop_map_section.append(Drop(entity.x * Cube_Size, entity.y * Cube_Size, entity.id + 100, entity.entity_face + 1, game_days))
+            if entity.drop_list.pop(0):
+                for a in entity.drop_list:
+                    for i in range(entity.entity_face + 1):
+                        rand_x = random.randint(-30, 30)
+                        rand_y = random.randint(-30, 30)
+                        drop_map.append(Drop(entity.x * Cube_Size + rand_x, entity.y * Cube_Size + rand_y, a, 1, game_days))
+                        #drop_map_section.append(Drop(entity.x * Cube_Size + rand_x, entity.y * Cube_Size + rand_y, entity.id + 200, 1, game_days))
+            else:
+                for i in entity.drop_list:
+                    rand_x = random.randint(-30, 30)
+                    rand_y = random.randint(-30, 30)
+                    drop_map.append(Drop(entity.x * Cube_Size + rand_x, entity.y * Cube_Size + rand_y, i, 1, game_days))
             if entity.drop:
                 pass
             entity.destroy()
 
     entities_to_remove.clear()
+
 
 def collision_checker(x, y):
 
@@ -235,31 +250,66 @@ def block_face_checker():
                 else:
                     world[x][y].block_face = 0
 
-#def update_entities
 
-def drop_manager():
+def drop_timeout_remover():
     global drop_map
-    global drop_map_section
     while True:
         #Remove uncollected drops
         for x in reversed(drop_map):
             if game_days - x.creation_day > 1:
                 drop_map.remove(x)
-        #for i in drop_map:
-            #if game_days - i.creation_day > 1:
-                #drop_map.remove(i)
 
+        time.sleep(10)
+
+
+def drop_manager():
+    global drop_map
+    global drop_map_section
+    while True:
         # Update list of visible drops
         temp_drop = []
         for i in drop_map:
             if player.x - 900 < i.x < player.x + 900 and player.y - 900 < i.y < player.y + 900:
-                    temp_drop.append(i)
+                temp_drop.append(i)
         drop_map_section = temp_drop[:]
 
 
+        temp_to_remove = []
+        #for i, j in itertools.combinations(drop_map_section, 2):
+        for i in range(len(drop_map_section)):
+            for j in range(i + 1, len(drop_map_section)):
+        #for i in drop_map_section:
+            #for j in drop_map_section:
+                #x = j.id - 200
+                a = drop_map_section[i]
+                b = drop_map_section[j]
+                if a.id == b.id :
+                    #x = i.id - 200
+                    distance = (((a.x - b.x) ** 2) + ((a.y - b.y) ** 2)) ** 0.5
+                    if abs(distance) < 90:
+                        temp_to_remove.append([a, b])
+
+        #print(len(temp_to_remove))
+        for i in reversed(temp_to_remove):
+            # x = i.id - 200
+            # if i.id - 200:
+            a, b = i
+            #print(b.id)
+            #print(a)
+            #print(drop_map)
+            #b = Drop(b.x, b.y, b.id, a.quantity + b.quantity, a.creation_day)
+            drop_map.append(Drop(b.x, b.y, b.id, a.quantity + b.quantity, a.creation_day))
+            drop_map.remove(b)
+            drop_map.remove(a)
+            #drop_map.remove(a)
+
+            for x in reversed(temp_to_remove):
+                if x[0] == a or x[1] == a or x[0] == b or x[1] == b:
+                    temp_to_remove.remove(x)
 
 
-        time.sleep(0.5)
+        time.sleep(0.05)
+
 
 def drop_collection_manager():
     global drop_map_section
@@ -373,6 +423,9 @@ mouse_clicker.start()
 
 update_visible_world = threading.Thread(target=update_world_section)
 update_visible_world.start()
+
+drop_timeout = threading.Thread(target=drop_timeout_remover)
+drop_timeout.start()
 
 drop_man = threading.Thread(target=drop_manager)
 drop_man.start()

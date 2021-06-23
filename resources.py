@@ -3,7 +3,7 @@ import pygame
 
 class Resources:
     def __init__(self):
-        self.images = [None] * 500
+        self.images = [None] * 700
         self.load_images()
 
     def load_images(self):
@@ -47,16 +47,18 @@ class Resources:
                      pygame.image.load('images/Blocks/water/water2.png').convert_alpha()]
 
         ############### Entities ##############################
-        images[100] = [pygame.image.load('images/Entities/tree/tree1.png').convert_alpha(),
+        images[200] = [pygame.image.load('images/Entities/tree/tree1.png').convert_alpha(),
                        pygame.image.load('images/Entities/tree/tree2.png').convert_alpha(),
                        pygame.image.load('images/Entities/tree/tree3.png').convert_alpha(),
                        pygame.image.load('images/Entities/tree/tree4.png').convert_alpha()]
 
         ############### Drops ##############################
-        images[200] = [pygame.image.load('images/Drops/wood/wood1.png').convert_alpha(),
+        images[400] = [pygame.image.load('images/Drops/wood/wood1.png').convert_alpha(),
                        pygame.image.load('images/Drops/wood/wood2.png').convert_alpha(),
                        pygame.image.load('images/Drops/wood/wood3.png').convert_alpha(),
-                       pygame.image.load('images/Drops/wood/wood4.png').convert_alpha()]
+                       pygame.image.load('images/Drops/wood/wood4.png').convert_alpha()
+                       ]
+
 
     def get_images(self):
         return self.images

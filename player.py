@@ -1,8 +1,7 @@
-import glob
 import threading
 import time
-
 import pygame
+
 
 class Player(pygame.sprite.Sprite):
 
@@ -19,6 +18,7 @@ class Player(pygame.sprite.Sprite):
         self.load_sprites()
         self.image = self.images_idle[self.index]
         self.hitbox = 0
+        self.inventory = []
 
 
         player_movement = threading.Thread(target=self.idle)
@@ -115,3 +115,11 @@ class Player(pygame.sprite.Sprite):
         #player_movement = threading.Thread(target=self.idle)
         #player_movement.start()
 
+
+    def get_inventory(self):
+        return self.inventory
+
+    def add_to_inventory(self, drop):
+        for i in self.inventory:
+            if i.id == drop.id or i.id == drop.id + 200 or i.id == drop.id - 200:
+                pass
