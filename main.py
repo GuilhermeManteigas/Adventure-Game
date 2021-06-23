@@ -5,6 +5,8 @@ import pygame
 import threading
 import time
 from resources import Resources
+from drop import Drop
+from entity import Entity
 import random
 
 
@@ -20,6 +22,8 @@ pygame.display.set_caption("Adventure Game")
 
 black = (0, 0, 0)
 
+entities_to_remove = []
+
 night_value = 0
 night_filter = pygame.Surface(size)
 night_filter.fill((0, 0, 0))
@@ -32,7 +36,7 @@ playing = True
 # The clock will be used to control how fast the screen updates
 clock = pygame.time.Clock()
 # Player declaration
-player = Player(1000, 1000)
+player = Player(2000, 2000)
 
 # Define some colors
 BLACK = (0, 0, 0)
@@ -43,10 +47,14 @@ BLUE = (0, 0, 255)
 
 world_size = 500
 world = WorldGenerator(world_size, world_size).get_world()
+drop_map = []#[[Drop(x, y, 0, 0) for y in range(world_size * 30)] for x in range(world_size * 30)]
+drop_map_section = []
 world_section = []
 Cube_Size = 30
 scroll = [0, 0]
 true_scroll = [0, 0]
+
+mouse_position = (0, 0)
 
 image_resources = Resources().get_images()
 
@@ -87,17 +95,48 @@ def draw_worldold():
 
 def draw_entities():
     a, b = light.get_size()
+    mouse_x, mouse_y = mouse_position
 
     if night_value > 0:
         night_filter.fill((night_value, night_value, night_value))
 
+    entity_remover()
     for i in world_section:
+
             if i.entity.id != 0:
+
+                #print("1")
+                if i.x == mouse_x and i.y == mouse_y:
+                    #print("2")
+                    screen.blit(pygame.image.load('images/Other/marker.png').convert_alpha(), (i.x * Cube_Size - scroll[0],i.y * Cube_Size - scroll[1]))
+                    #print("3")
+                #print("4")
                 i.entity.update(game_days)
+                #print("5")
+                #print(i.entity.id,i.entity.entity_face,i.x,i.y)
+
+                #print("a")
+                #a = image_resources[i.entity.id][i.entity.entity_face]
+                #print("b")
+                #print(i.x * Cube_Size - scroll[0])
+                #print("c")
+                #print(i.entity.id, i.entity.entity_face)
+                #print(i.y * Cube_Size - scroll[1] - image_resources[i.entity.id][i.entity.entity_face].get_height() + Cube_Size)
+
+
                 screen.blit(image_resources[i.entity.id][i.entity.entity_face], (i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1] - image_resources[i.entity.id][i.entity.entity_face].get_height() + Cube_Size))
                 i.entity.hitbox = pygame.Rect((i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1]), (Cube_Size, Cube_Size))
                 if night_value > 0:
                     night_filter.blit(light, (i.x * Cube_Size - scroll[0] - a/2, i.y * Cube_Size - scroll[1] - b/2))
+
+
+def draw_drops():
+
+    for i in drop_map_section:
+        screen.blit(image_resources[i.id][i.face], (i.x - scroll[0], i.y - scroll[1] - image_resources[i.id][i.face].get_height() + Cube_Size))
+        #print(i.x,i.y)
+        #screen.blit(image_resources[i.id][i.face], (i.x, i.y))
+
 
 
 def show_fps(window, clock):
@@ -110,6 +149,19 @@ def show_fps(window, clock):
     window.blit(coors_overlay, (0, 0))
 
 
+def entity_remover():
+    for i in entities_to_remove:
+        #print(i)
+        x, y = i
+        entity = world[x][y].entity
+        if entity.id != 0:
+            #drop_map.append(Drop(entity.x * Cube_Size - scroll[0], entity.y * Cube_Size - scroll[1], entity.id + 100 , entity.entity_face + 1))
+            drop_map.append(Drop(entity.x * Cube_Size, entity.y * Cube_Size, entity.id + 100, entity.entity_face + 1, game_days))
+            if entity.drop:
+                pass
+            entity.destroy()
+
+    entities_to_remove.clear()
 
 def collision_checker(x, y):
 
@@ -185,6 +237,51 @@ def block_face_checker():
 
 #def update_entities
 
+def drop_manager():
+    global drop_map
+    global drop_map_section
+    while True:
+        #Remove uncollected drops
+        for x in reversed(drop_map):
+            if game_days - x.creation_day > 1:
+                drop_map.remove(x)
+        #for i in drop_map:
+            #if game_days - i.creation_day > 1:
+                #drop_map.remove(i)
+
+        # Update list of visible drops
+        temp_drop = []
+        for i in drop_map:
+            if player.x - 900 < i.x < player.x + 900 and player.y - 900 < i.y < player.y + 900:
+                    temp_drop.append(i)
+        drop_map_section = temp_drop[:]
+
+
+
+
+        time.sleep(0.5)
+
+def drop_collection_manager():
+    global drop_map_section
+    while True:
+        #move drops to player
+        for i in drop_map_section:
+            distance = (((player.x - i.x) ** 2) + ((player.y - i.y) ** 2)) ** 0.5
+            if abs(distance) < 190:
+                if player.x - Cube_Size - i.x < 0:
+                    i.x -= 4
+                elif player.x - Cube_Size - i.x > 0:
+                    i.x += 4
+                if player.y - Cube_Size - i.y < 0:
+                    i.y -= 4
+                elif player.y - Cube_Size - i.y > 0:
+                    i.y += 4
+                if player.x - Cube_Size == i.x and player.y - Cube_Size == i.y:
+                    #Put drop in inventory
+                    pass
+
+        time.sleep(0.01)#time.sleep(Game_Tick)
+
 def time_handler():
     #update_visible_world = threading.Thread(target=update_world_section)
     #update_visible_world.start()
@@ -227,12 +324,61 @@ def player_movement_handler():
 
         time.sleep(Game_Tick/15)
 
+def mouse_movement_handler():
+    global mouse_position
+    while game_running:
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        block_x = int((mouse_x * (1 / 30)) + (scroll[0] * (1 / 30)))  # int(mouse_x / Cube_Size) - scroll[0]
+        block_y = int((mouse_y * (1 / 30)) + (scroll[1] * (1 / 30)))
+        mouse_position = (block_x, block_y)
+
+        time.sleep(0.01)
+
+def mouse_clicker_handler():
+    #global mouse_position
+    while game_running:
+        mouse_x, mouse_y = mouse_position
+        #print(mouse_position)
+        left, middle, right = pygame.mouse.get_pressed()
+        if left:
+            #mouse_x, mouse_y = pygame.mouse.get_pos()
+
+            #str((int(player.x / Cube_Size), int(player.y / Cube_Size)))
+
+            #entity_x = int((mouse_x * (1/30)) + (scroll[0] * (1/30))) #int(mouse_x / Cube_Size) - scroll[0]
+            #entity_y = int((mouse_y * (1/30)) + (scroll[1] * (1/30))) #int(mouse_y / Cube_Size) - scroll[1]
+
+            #print(entity_x)
+            #print(entity_y)
+
+            entities_to_remove.append((mouse_x,mouse_y))
+            #world[mouse_x][mouse_y].entity = Entity(0, False, 0)
+
+            #(i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1] - image_resources[i.entity.id][i.entity.entity_face].get_height() + Cube_Size)
+
+            print("Left Mouse Key is being pressed")
+            time.sleep(0.1)
+
+        time.sleep(0.01)
+
 
 player_movement = threading.Thread(target=player_movement_handler)
 player_movement.start()
 
+mouse_movement = threading.Thread(target=mouse_movement_handler)
+mouse_movement.start()
+
+mouse_clicker = threading.Thread(target=mouse_clicker_handler)
+mouse_clicker.start()
+
 update_visible_world = threading.Thread(target=update_world_section)
 update_visible_world.start()
+
+drop_man = threading.Thread(target=drop_manager)
+drop_man.start()
+
+drop_col_man = threading.Thread(target=drop_collection_manager)
+drop_col_man.start()
 
 time_handler = threading.Thread(target=time_handler)
 time_handler.start()
@@ -240,7 +386,7 @@ time_handler.start()
 
 block_face_checker()
 
-
+button_pressed = False
 light = pygame.image.load('circle2.png').convert_alpha()
 
 #pygame.display.toggle_fullscreen()
@@ -257,6 +403,38 @@ while playing:
                 pygame.display.set_mode(size)
             else:
                 pygame.display.set_mode(size, pygame.FULLSCREEN)
+        #elif event.type == pygame.MOUSEBUTTONUP:
+            #button_pressed = False
+            #pass
+        #elif event.type == pygame.MOUSEBUTTONDOWN: #and not button_pressed:
+            #mouse_x, mouse_y = pygame.mouse.get_pos()
+            #print("Mouse Press: ", mouse_x, mouse_y)
+            #notTower = True
+            #for t in tower_placeholder_list:
+            #    if t.posx - t.tower_width/2 < mouse_x < t.posx + t.tower_width/2 and t.posy - t.tower_height/2 < mouse_y < t.posy + t.tower_height/2:
+            #        t.levelup()
+            #        notTower = False
+            #        break
+            #if notTower:
+            #    button_pressed = True
+            #    bullet = Bullet(rotate_image_by_angle(bulletImg, mouse_angle(x, y)), x, y, mouse_angle(x, y), 5)
+            #    bullet_list.append(bullet)
+            #    btndown = threading.Thread(target=auto_shoot)
+            #    btndown.start()
+        #if event.type == pygame.MOUSEMOTION:
+            #mouse_position = pygame.mouse.get_pos()
+            #print("Mouse Coords: ", mouse_x, mouse_y)
+            #for t in tower_placeholder_list:
+            #    if t.level == 0:
+            #        if t.posx - t.tower_width/2 < mouse_x < t.posx + t.tower_width/2 and t.posy - t.tower_height/2 < mouse_y < t.posy + t.tower_height/2:
+            #            t.image = towerplaceholdermouseoverImg
+            #        else:
+            #            t.image = towerplaceholderImg
+            #    elif t.level > 0:
+            #        if t.posx - t.tower_width / 2 < mouse_x < t.posx + t.tower_width / 2 and t.posy - t.tower_height / 2 < mouse_y < t.posy + t.tower_height / 2:
+            #            t.mouseover = True
+            #        else:
+            #            t.mouseover = False
 
     #screen.fill(BLUE)
 
@@ -267,14 +445,15 @@ while playing:
     scroll = true_scroll.copy()
     scroll[0] = int(scroll[0])
     scroll[1] = int(scroll[1])
-    print("--- A: %s seconds ---" % (time.time() - start_time))
+    #print("--- A: %s seconds ---" % (time.time() - start_time))
 
     start_time = time.time()
     draw_world()
-    print("--- Draw World: %s seconds ---" % (time.time() - start_time))
+    #print("--- Draw World: %s seconds ---" % (time.time() - start_time))
     start_time = time.time()
     draw_entities()
-    print("--- Draw Entities: %s seconds ---" % (time.time() - start_time))
+    draw_drops()
+    #print("--- Draw Entities: %s seconds ---" % (time.time() - start_time))
 
     start_time = time.time()
     rect = player.image.get_rect()
@@ -282,11 +461,11 @@ while playing:
     player.hitbox = pygame.Rect(rect)
     screen.blit(player.image, rect)
     pygame.draw.rect(screen, RED, rect, 1)
-    print("--- Player: %s seconds ---" % (time.time() - start_time))
+    #print("--- Player: %s seconds ---" % (time.time() - start_time))
     #screen.blit(player.image, (player.x - scroll[0], player.y - scroll[1]))
     start_time = time.time()
     show_fps(screen, clock)
-    print("--- FPS: %s seconds ---" % (time.time() - start_time))
+    #print("--- FPS: %s seconds ---" % (time.time() - start_time))
 
     if night_value > 0:
         start_time = time.time()
@@ -295,7 +474,7 @@ while playing:
         #night_filter.blit(light, (330, 30))
         screen.blit(night_filter, (0, 0), special_flags=pygame.BLEND_RGBA_SUB)
 
-        print("--- Night: %s seconds ---" % (time.time() - start_time))
+        #print("--- Night: %s seconds ---" % (time.time() - start_time))
 
     pygame.display.flip()
 

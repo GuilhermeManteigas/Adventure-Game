@@ -52,5 +52,11 @@ class Resources:
                        pygame.image.load('images/Entities/tree/tree3.png').convert_alpha(),
                        pygame.image.load('images/Entities/tree/tree4.png').convert_alpha()]
 
+        ############### Drops ##############################
+        images[200] = [pygame.image.load('images/Drops/wood/wood1.png').convert_alpha(),
+                       pygame.image.load('images/Drops/wood/wood2.png').convert_alpha(),
+                       pygame.image.load('images/Drops/wood/wood3.png').convert_alpha(),
+                       pygame.image.load('images/Drops/wood/wood4.png').convert_alpha()]
+
     def get_images(self):
         return self.images

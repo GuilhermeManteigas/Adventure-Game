@@ -146,7 +146,7 @@ class WorldGenerator:
             for j in range(width):
                 block = world[i][j]
                 if block.id == 1 and random.randint(0, 100) == 1:
-                    block.entity = Entity(100, True, 2)
+                    block.entity = Entity(100, i, j, True, 2)
                     #block.entity.entity_face = 2
         print("--- Generate Trees: %s seconds ---" % (time.time() - start_time))
         start_time = time.time()
