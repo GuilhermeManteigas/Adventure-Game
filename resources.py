@@ -56,8 +56,7 @@ class Resources:
         images[400] = [pygame.image.load('images/Drops/wood/wood1.png').convert_alpha(),
                        pygame.image.load('images/Drops/wood/wood2.png').convert_alpha(),
                        pygame.image.load('images/Drops/wood/wood3.png').convert_alpha(),
-                       pygame.image.load('images/Drops/wood/wood4.png').convert_alpha()
-                       ]
+                       pygame.image.load('images/Drops/wood/wood4.png').convert_alpha()]
 
 
     def get_images(self):

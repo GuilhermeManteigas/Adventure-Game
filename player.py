@@ -19,6 +19,7 @@ class Player(pygame.sprite.Sprite):
         self.image = self.images_idle[self.index]
         self.hitbox = 0
         self.inventory = []
+        self.inventory_full = False
 
 
         player_movement = threading.Thread(target=self.idle)
@@ -115,11 +116,21 @@ class Player(pygame.sprite.Sprite):
         #player_movement = threading.Thread(target=self.idle)
         #player_movement.start()
 
-
     def get_inventory(self):
         return self.inventory
 
     def add_to_inventory(self, drop):
+        item_added = False
         for i in self.inventory:
-            if i.id == drop.id or i.id == drop.id + 200 or i.id == drop.id - 200:
-                pass
+            if i[0] == drop.id:
+                i[1] += drop.quantity
+                item_added = True
+                return True
+        if not item_added:
+            if len(self.inventory) < 20:
+                self.inventory.append((drop.id, drop.quantity))
+                return True
+            else:
+                self.inventory_full = True
+                return False
+
