@@ -11,6 +11,8 @@ class Entity:
         self.age = age
         self.drop = False
         self.drop_list = drop_list
+        self.max_health = 100
+        self.health = self.max_health
 
     def update(self, time):
         if not self.drop:
@@ -43,3 +45,8 @@ class Entity:
         #    self.create_time = 0
         #    self.age = 0
         #    self.drop = True
+
+    def damage(self, points):
+        self.health -= points
+        if self.health < 0:
+            self.health = 0

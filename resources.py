@@ -58,6 +58,10 @@ class Resources:
                        pygame.image.load('images/Drops/wood/wood3.png').convert_alpha(),
                        pygame.image.load('images/Drops/wood/wood4.png').convert_alpha()]
 
+        ############### Extra ##############################
+        images[600] = [pygame.image.load('images/Other/light.png').convert_alpha()]
+        images[601] = [pygame.image.load('images/Other/marker.png').convert_alpha()]
+
 
     def get_images(self):
         return self.images

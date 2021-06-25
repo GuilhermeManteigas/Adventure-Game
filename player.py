@@ -121,14 +121,15 @@ class Player(pygame.sprite.Sprite):
 
     def add_to_inventory(self, drop):
         item_added = False
-        for i in self.inventory:
-            if i[0] == drop.id:
-                i[1] += drop.quantity
+        for idx, i in enumerate(self.inventory):
+            if i[0] == drop[0]:
+                self.inventory[idx] = (i[0], i[1] + drop[1])
+                #i[1] += drop[1]
                 item_added = True
                 return True
         if not item_added:
             if len(self.inventory) < 20:
-                self.inventory.append((drop.id, drop.quantity))
+                self.inventory.append((drop[0], drop[1]))
                 return True
             else:
                 self.inventory_full = True

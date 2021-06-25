@@ -17,7 +17,11 @@ size = (1280, 720)
 #screen = pygame.display.set_mode(size, pygame.SCALED | pygame.RESIZABLE) #pygame.FULLSCREEN
 #screen = pygame.display.set_mode(size, pygame.FULLSCREEN)
 #screen = pygame.display.set_mode(size, pygame.RESIZABLE | pygame.SCALED)
-screen = pygame.display.set_mode(size)
+
+
+screen = pygame.display.set_mode(size, pygame.SCALED)
+
+#screen = pygame.display.set_mode(size)
 pygame.display.set_caption("Adventure Game")
 
 black = (0, 0, 0)
@@ -80,6 +84,7 @@ def draw_world():
 
 
 def draw_entities():
+    light = image_resources[600][0]
     a, b = light.get_size()
     mouse_x, mouse_y = mouse_position
 
@@ -91,10 +96,20 @@ def draw_entities():
 
             if i.entity.id != 0:
                 if i.x == mouse_x and i.y == mouse_y:
-                    screen.blit(pygame.image.load('images/Other/marker.png').convert_alpha(), (i.x * Cube_Size - scroll[0],i.y * Cube_Size - scroll[1]))
+                    # Draw Marker
+                    screen.blit(image_resources[601][0], (i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1]))
                 i.entity.update(game_days)
                 screen.blit(image_resources[i.entity.id][i.entity.entity_face], (i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1] - image_resources[i.entity.id][i.entity.entity_face].get_height() + Cube_Size))
                 i.entity.hitbox = pygame.Rect((i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1]), (Cube_Size, Cube_Size))
+                if i.entity.health < i.entity.max_health:
+                    # Draw grey back
+                    pygame.draw.rect(screen, (30, 30, 30), (i.x * Cube_Size - scroll[0] - 2, i.y * Cube_Size - scroll[1] + Cube_Size + 10 - 2, 30 + 4, 5 + 4))
+                    # Draw life Green/Red
+                    if i.entity.health >= i.entity.max_health/2:
+                        pygame.draw.rect(screen, (127, 255, 0), (i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1] + Cube_Size + 10, i.entity.health / 3.3, 5))
+                    else:
+                        pygame.draw.rect(screen, (255, 0, 0), (i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1] + Cube_Size + 10, i.entity.health / 3.3, 5))
+
                 if night_value > 0:
                     night_filter.blit(light, (i.x * Cube_Size - scroll[0] - a/2, i.y * Cube_Size - scroll[1] - b/2))
 
@@ -233,6 +248,7 @@ def drop_manager():
         drop_map_section = temp_drop[:]
 
 
+        # Stacks drops
         temp_to_remove = []
         for i in range(len(drop_map_section)):
             for j in range(i + 1, len(drop_map_section)):
@@ -240,7 +256,9 @@ def drop_manager():
                 b = drop_map_section[j]
                 if a.id == b.id:
                     distance = (((a.x - b.x) ** 2) + ((a.y - b.y) ** 2)) ** 0.5
-                    if abs(distance) < 90:
+                    player_distance_a = (((player.x - a.x) ** 2) + ((player.y - a.y) ** 2)) ** 0.5
+                    player_distance_b = (((player.x - b.x) ** 2) + ((player.y - b.y) ** 2)) ** 0.5
+                    if abs(distance) < 90 and abs(player_distance_a) > 220 and abs(player_distance_b) > 220:
                         temp_to_remove.append([a, b])
 
         for i in reversed(temp_to_remove):
@@ -267,13 +285,21 @@ def drop_collection_manager():
                     i.x -= 4
                 elif player.x - Cube_Size - i.x > 0:
                     i.x += 4
+
                 if player.y - Cube_Size - i.y < 0:
                     i.y -= 4
                 elif player.y - Cube_Size - i.y > 0:
                     i.y += 4
-                if player.x - Cube_Size == i.x and player.y - Cube_Size == i.y:
+
+                if i.x - 35 < player.x - Cube_Size < i.x + 35 and i.y - 35 < player.y - Cube_Size < i.y + 35:
                     player.add_to_inventory((i.id, i.quantity))
+                    try:
+                        drop_map.remove(i)
+                        drop_map_section.remove(i)
+                    except:
+                        print("problem")
                     pass
+        #print(player.inventory)
 
         time.sleep(0.01)
 
@@ -300,6 +326,8 @@ def player_movement_handler():
     while game_running:
         keys = pygame.key.get_pressed()
         if keys[pygame.K_a]:
+            #global screen
+            #screen = pygame.display.set_mode(size, pygame.SCALED | pygame.NOFRAME)
             collision_checker(player.x - player.speed, player.y)
         elif keys[pygame.K_d]:
             collision_checker(player.x + player.speed, player.y)
@@ -327,10 +355,18 @@ def mouse_clicker_handler():
         mouse_x, mouse_y = mouse_position
         left, middle, right = pygame.mouse.get_pressed()
         if left:
-            entities_to_remove.append((mouse_x,mouse_y))
+            entity = world[mouse_x][mouse_y].entity
+            if entity.health <= 0:
+                entities_to_remove.append((mouse_x, mouse_y))
+            else:
+                entity.damage(10)
+
             time.sleep(0.1)
 
         time.sleep(0.01)
+
+
+
 
 
 player_movement = threading.Thread(target=player_movement_handler)
@@ -361,22 +397,28 @@ time_handler.start()
 block_face_checker()
 
 button_pressed = False
-light = pygame.image.load('circle2.png').convert_alpha()
 
 #pygame.display.toggle_fullscreen()
 
 # -------- Main Program Loop -----------
 while playing:
     # --- Main event loop
-    for event in pygame.event.get():  # User did something
-        if event.type == pygame.QUIT:  # If user clicked close
-            playing = False  # Flag that we are done so we exit this loop
-        if (event.type is pygame.KEYDOWN and event.key == pygame.K_f):
-            print("f")
-            if screen.get_flags() & pygame.FULLSCREEN:
-                pygame.display.set_mode(size)
-            else:
-                pygame.display.set_mode(size, pygame.FULLSCREEN)
+    #for event in pygame.event.get():  # User did something
+        #if event.type == pygame.QUIT:  # If user clicked close
+            #playing = False  # Flag that we are done so we exit this loop
+        #if (event.type is pygame.KEYDOWN and event.key == pygame.K_f):
+            #print("f")
+            #if screen.get_flags() & pygame.FULLSCREEN:
+                #pygame.display.set_mode(size)
+            #else:
+                #pygame.display.set_mode(size, pygame.FULLSCREEN)
+    for e in pygame.event.get():
+        if e.type == pygame.KEYDOWN:
+            if e.key == pygame.K_F2:
+                screen = pygame.display.set_mode(size, pygame.SCALED | pygame.FULLSCREEN)
+                #night_filter = pygame.Surface(size)
+        if e.type == pygame.QUIT:
+            playing = False
 
     start_time = time.time()
     screen_width, screen_height = screen.get_size()
@@ -412,6 +454,8 @@ while playing:
         screen.blit(night_filter, (0, 0), special_flags=pygame.BLEND_RGBA_SUB)
 
         #print("--- Night: %s seconds ---" % (time.time() - start_time))
+
+
 
     pygame.display.flip()
 
