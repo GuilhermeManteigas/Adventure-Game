@@ -11,6 +11,9 @@ from entity import Entity
 from options import Options
 from worldloader import Worldloader
 import random
+import numpy as np
+import scipy.misc as smp
+from PIL import Image
 
 
 os.environ["SDL_VIDEO_CENTERED"] = "1"
@@ -50,7 +53,7 @@ GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 
-world_size = 100
+world_size = 500
 world = WorldGenerator(world_size, world_size).get_world()
 drop_map = []
 drop_map_section = []
@@ -65,6 +68,30 @@ image_resources = Resources().get_images()
 
 options = Options()
 world_loader = Worldloader()
+
+if options.fullscreen:
+    screen = pygame.display.set_mode(size, pygame.SCALED | pygame.FULLSCREEN)
+
+def map_to_img(world):
+    # Create a 1024x1024x3 array of 8 bit unsigned integers
+    data = np.zeros((len(world), len(world), 3), dtype=np.uint8)
+
+    for x in range(len(world)):
+        for y in range(len(world)):
+            if world[x][y].id == 1:
+                data[x, y] = [0, 255, 0]
+
+
+    #for i in world:
+        #if i.id == 1:
+            #data[512, 512] = [0, 255, 0]
+
+    #data[512, 512] = [254, 0, 0]  # Makes the middle pixel red
+    #data[512, 513] = [0, 0, 255]  # Makes the next pixel blue
+
+    #img = Image.fromarray(data)  # Create a PIL image
+    #img.show()  # View in default viewer
+    return Image.fromarray(data)
 
 
 def main_menu():
@@ -143,7 +170,9 @@ def main_menu():
 
 def save_selector_menu():
     bg = pygame.image.load('images/Menu/bg.jpg').convert()
-    play_btn = pygame.image.load('images/Menu/right_arrow1.png').convert()
+    play_btn = [pygame.image.load('images/Menu/play1.png').convert_alpha(),pygame.image.load('images/Menu/play2.png').convert_alpha()]
+
+    #world_loader.load()
 
     #back_button = [pygame.image.load('images/Menu/back_button1.png').convert_alpha(),
     #               pygame.image.load('images/Menu/back_button2.png').convert_alpha()]
@@ -164,6 +193,10 @@ def save_selector_menu():
                     click = True
             if e.type == pygame.QUIT:
                 return
+
+
+
+
 
         FPS_FONT = pygame.font.SysFont("franklingothicmedium", 70)
         color = pygame.Color("black")
@@ -201,10 +234,51 @@ def save_selector_menu():
         btn_save7 = pygame.Rect(688, 420, 200, 200)
         btn_save8 = pygame.Rect(984, 420, 200, 200)
 
+        if world_loader.worlds_minimaps[0] is not None:
+            map = pygame.transform.scale(pygame.image.load(world_loader.worlds_minimaps[0]).convert_alpha(), (200, 200))
+            text_rect = map.get_rect(center=btn_save1.center)
+            screen.blit(map, text_rect)
+        if world_loader.worlds_minimaps[1] is not None:
+            map = pygame.transform.scale(pygame.image.load(world_loader.worlds_minimaps[1]).convert_alpha(), (200, 200))
+            text_rect = map.get_rect(center=btn_save2.center)
+            screen.blit(map, text_rect)
+        if world_loader.worlds_minimaps[2] is not None:
+            map = pygame.transform.scale(pygame.image.load(world_loader.worlds_minimaps[2]).convert_alpha(), (200, 200))
+            text_rect = map.get_rect(center=btn_save3.center)
+            screen.blit(map, text_rect)
+        if world_loader.worlds_minimaps[3] is not None:
+            map = pygame.transform.scale(pygame.image.load(world_loader.worlds_minimaps[3]).convert_alpha(), (200, 200))
+            text_rect = map.get_rect(center=btn_save4.center)
+            screen.blit(map, text_rect)
+        if world_loader.worlds_minimaps[4] is not None:
+            map = pygame.transform.scale(pygame.image.load(world_loader.worlds_minimaps[4]).convert_alpha(), (200, 200))
+            text_rect = map.get_rect(center=btn_save5.center)
+            screen.blit(map, text_rect)
+        if world_loader.worlds_minimaps[5] is not None:
+            map = pygame.transform.scale(pygame.image.load(world_loader.worlds_minimaps[5]).convert_alpha(), (200, 200))
+            text_rect = map.get_rect(center=btn_save6.center)
+            screen.blit(map, text_rect)
+        if world_loader.worlds_minimaps[6] is not None:
+            map = pygame.transform.scale(pygame.image.load(world_loader.worlds_minimaps[6]).convert_alpha(), (200, 200))
+            text_rect = map.get_rect(center=btn_save7.center)
+            screen.blit(map, text_rect)
+        if world_loader.worlds_minimaps[7] is not None:
+            map = pygame.transform.scale(pygame.image.load(world_loader.worlds_minimaps[7]).convert_alpha(), (200, 200))
+            text_rect = map.get_rect(center=btn_save8.center)
+            screen.blit(map, text_rect)
+
+
+
+
+
+
+
 
         if btn_save1.collidepoint((mx, my)):
             btn_save1_inflated = pygame.Rect(btn_save1.x - 1, btn_save1.y - 1, btn_save1.width + 2, btn_save1.height + 2)
             pygame.draw.rect(screen, (255, 255, 255), btn_save1_inflated, 2)
+            if world_loader.worlds[0] is not None:
+                screen.blit(play_btn[1], play_btn[1].get_rect(center=btn_save1.center))
             if click:
                 if world_loader.worlds[0] is None:
                     world_loader.world_in_use = 0
@@ -214,123 +288,164 @@ def save_selector_menu():
                     world_loader.world_in_use = 0
                     play()
 
-                pass
         if btn_save2.collidepoint((mx, my)):
             btn_save1_inflated = pygame.Rect(btn_save2.x - 1, btn_save2.y - 1, btn_save2.width + 2, btn_save2.height + 2)
             pygame.draw.rect(screen, (255, 255, 255), btn_save1_inflated, 2)
+            if world_loader.worlds[1] is not None:
+                screen.blit(play_btn[1], play_btn[1].get_rect(center=btn_save2.center))
             if click:
-                pass
+                if world_loader.worlds[1] is None:
+                    world_loader.world_in_use = 1
+                    play()
+                else:
+                    save_load(world_loader.worlds[1])
+                    world_loader.world_in_use = 1
+                    play()
+
         if btn_save3.collidepoint((mx, my)):
             btn_save1_inflated = pygame.Rect(btn_save3.x - 1, btn_save3.y - 1, btn_save3.width + 2, btn_save3.height + 2)
             pygame.draw.rect(screen, (255, 255, 255), btn_save1_inflated, 2)
+            if world_loader.worlds[2] is not None:
+                screen.blit(play_btn[1], play_btn[1].get_rect(center=btn_save3.center))
             if click:
-                pass
+                if world_loader.worlds[2] is None:
+                    world_loader.world_in_use = 2
+                    play()
+                else:
+                    save_load(world_loader.worlds[2])
+                    world_loader.world_in_use = 2
+                    play()
+
         if btn_save4.collidepoint((mx, my)):
             btn_save1_inflated = pygame.Rect(btn_save4.x - 1, btn_save4.y - 1, btn_save4.width + 2, btn_save4.height + 2)
             pygame.draw.rect(screen, (255, 255, 255), btn_save1_inflated, 2)
+            if world_loader.worlds[3] is not None:
+                screen.blit(play_btn[1], play_btn[1].get_rect(center=btn_save4.center))
             if click:
-                pass
+                if world_loader.worlds[3] is None:
+                    world_loader.world_in_use = 3
+                    play()
+                else:
+                    save_load(world_loader.worlds[3])
+                    world_loader.world_in_use = 3
+                    play()
+
         if btn_save5.collidepoint((mx, my)):
             btn_save1_inflated = pygame.Rect(btn_save5.x - 1, btn_save5.y - 1, btn_save5.width + 2, btn_save5.height + 2)
             pygame.draw.rect(screen, (255, 255, 255), btn_save1_inflated, 2)
+            if world_loader.worlds[4] is not None:
+                screen.blit(play_btn[1], play_btn[1].get_rect(center=btn_save5.center))
             if click:
-                pass
+                if world_loader.worlds[4] is None:
+                    world_loader.world_in_use = 4
+                    play()
+                else:
+                    save_load(world_loader.worlds[4])
+                    world_loader.world_in_use = 4
+                    play()
+
         if btn_save6.collidepoint((mx, my)):
             btn_save1_inflated = pygame.Rect(btn_save6.x - 1, btn_save6.y - 1, btn_save6.width + 2, btn_save6.height + 2)
             pygame.draw.rect(screen, (255, 255, 255), btn_save1_inflated, 2)
+            if world_loader.worlds[5] is not None:
+                screen.blit(play_btn[1], play_btn[1].get_rect(center=btn_save6.center))
             if click:
-                pass
+                if world_loader.worlds[5] is None:
+                    world_loader.world_in_use = 5
+                    play()
+                else:
+                    save_load(world_loader.worlds[5])
+                    world_loader.world_in_use = 5
+                    play()
+
         if btn_save7.collidepoint((mx, my)):
             btn_save1_inflated = pygame.Rect(btn_save7.x - 1, btn_save7.y - 1, btn_save7.width + 2, btn_save7.height + 2)
             pygame.draw.rect(screen, (255, 255, 255), btn_save1_inflated, 2)
+            if world_loader.worlds[6] is not None:
+                screen.blit(play_btn[1], play_btn[1].get_rect(center=btn_save7.center))
             if click:
-                pass
+                if world_loader.worlds[6] is None:
+                    world_loader.world_in_use = 6
+                    play()
+                else:
+                    save_load(world_loader.worlds[6])
+                    world_loader.world_in_use = 6
+                    play()
+
         if btn_save8.collidepoint((mx, my)):
             btn_save1_inflated = pygame.Rect(btn_save8.x - 1, btn_save8.y - 1, btn_save8.width + 2, btn_save8.height + 2)
             pygame.draw.rect(screen, (255, 255, 255), btn_save1_inflated, 2)
+            if world_loader.worlds[7] is not None:
+                screen.blit(play_btn[1], play_btn[1].get_rect(center=btn_save8.center))
             if click:
-                pass
+                if world_loader.worlds[7] is None:
+                    world_loader.world_in_use = 7
+                    play()
+                else:
+                    save_load(world_loader.worlds[7])
+                    world_loader.world_in_use = 7
+                    play()
 
-
-        a, b = btn_save1.center
-        btn_center = (a, b)
-        #print(world_loader.worlds)
         if world_loader.worlds[0] is None:
-            text_rect = text_plus.get_rect(center=btn_center)
+            text_rect = text_plus.get_rect(center=btn_save1.center)
             screen.blit(text_plus, text_rect)
         else:
-            text_rect = play_btn.get_rect(center=btn_center)
-            screen.blit(play_btn, text_rect)
-            #screen.blit(text_play, text_rect)
+            text_rect = play_btn[0].get_rect(center=btn_save1.center)
+            screen.blit(play_btn[0], text_rect)
 
-        a, b = btn_save2.center
-        btn_center = (a, b)
         if world_loader.worlds[1] is None:
-            text_rect = text_plus.get_rect(center=btn_center)
+            text_rect = text_plus.get_rect(center=btn_save2.center)
             screen.blit(text_plus, text_rect)
         else:
-            text_rect = text_play.get_rect(center=btn_center)
-            screen.blit(text_play, text_rect)
+            text_rect = play_btn[0].get_rect(center=btn_save2.center)
+            screen.blit(play_btn[0], text_rect)
 
-        a, b = btn_save3.center
-        btn_center = (a, b)
         if world_loader.worlds[2] is None:
-            text_rect = text_plus.get_rect(center=btn_center)
+            text_rect = text_plus.get_rect(center=btn_save3.center)
             screen.blit(text_plus, text_rect)
         else:
-            text_rect = text_play.get_rect(center=btn_center)
-            screen.blit(text_play, text_rect)
+            text_rect = play_btn[0].get_rect(center=btn_save3.center)
+            screen.blit(play_btn[0], text_rect)
 
-        a, b = btn_save4.center
-        btn_center = (a, b)
         if world_loader.worlds[3] is None:
-            text_rect = text_plus.get_rect(center=btn_center)
+            text_rect = text_plus.get_rect(center=btn_save4.center)
             screen.blit(text_plus, text_rect)
         else:
-            text_rect = text_play.get_rect(center=btn_center)
-            screen.blit(text_play, text_rect)
+            text_rect = play_btn[0].get_rect(center=btn_save4.center)
+            screen.blit(play_btn[0], text_rect)
 
-        a, b = btn_save5.center
-        btn_center = (a, b)
         if world_loader.worlds[4] is None:
-            text_rect = text_plus.get_rect(center=btn_center)
+            text_rect = text_plus.get_rect(center=btn_save5.center)
             screen.blit(text_plus, text_rect)
         else:
-            text_rect = text_play.get_rect(center=btn_center)
-            screen.blit(text_play, text_rect)
+            text_rect = play_btn[0].get_rect(center=btn_save5.center)
+            screen.blit(play_btn[0], text_rect)
 
-        a, b = btn_save6.center
-        btn_center = (a, b)
         if world_loader.worlds[5] is None:
-            text_rect = text_plus.get_rect(center=btn_center)
+            text_rect = text_plus.get_rect(center=btn_save6.center)
             screen.blit(text_plus, text_rect)
         else:
-            text_rect = text_play.get_rect(center=btn_center)
-            screen.blit(text_play, text_rect)
+            text_rect = play_btn[0].get_rect(center=btn_save6.center)
+            screen.blit(play_btn[0], text_rect)
 
-        a, b = btn_save7.center
-        btn_center = (a, b)
         if world_loader.worlds[6] is None:
-            text_rect = text_plus.get_rect(center=btn_center)
+            text_rect = text_plus.get_rect(center=btn_save7.center)
             screen.blit(text_plus, text_rect)
         else:
-            text_rect = text_play.get_rect(center=btn_center)
-            screen.blit(text_play, text_rect)
+            text_rect = play_btn[0].get_rect(center=btn_save7.center)
+            screen.blit(play_btn[0], text_rect)
 
-        a, b = btn_save8.center
-        btn_center = (a, b)
         if world_loader.worlds[7] is None:
-            text_rect = text_plus.get_rect(center=btn_center)
+            text_rect = text_plus.get_rect(center=btn_save8.center)
             screen.blit(text_plus, text_rect)
         else:
-            text_rect = text_play.get_rect(center=btn_center)
-            screen.blit(text_play, text_rect)
+            text_rect = play_btn[0].get_rect(center=btn_save8.center)
+            screen.blit(play_btn[0], text_rect)
 
         pygame.draw.rect(screen, (0, 0, 0), btn_save1, 2)
         pygame.draw.rect(screen, (0, 0, 0), btn_save2, 2)
         pygame.draw.rect(screen, (0, 0, 0), btn_save3, 2)
         pygame.draw.rect(screen, (0, 0, 0), btn_save4, 2)
-
         pygame.draw.rect(screen, (0, 0, 0), btn_save5, 2)
         pygame.draw.rect(screen, (0, 0, 0), btn_save6, 2)
         pygame.draw.rect(screen, (0, 0, 0), btn_save7, 2)
@@ -459,10 +574,22 @@ def options_menu():
             screen.blit(left_arrow_button[1], btn_fullscreen_left)
             if click:
                 options.update_fullscreen()
+                if options.fullscreen:
+                    screen = pygame.display.set_mode(size, pygame.SCALED | pygame.FULLSCREEN)
+                else:
+                    pygame.display.quit()
+                    pygame.display.get_init()
+                    screen = pygame.display.set_mode(size, pygame.SCALED)
         if btn_fullscreen_right.collidepoint((mx, my)):
             screen.blit(right_arrow_button[1], btn_fullscreen_right)
             if click:
                 options.update_fullscreen()
+                if options.fullscreen:
+                    screen = pygame.display.set_mode(size, pygame.SCALED | pygame.FULLSCREEN)
+                else:
+                    pygame.display.quit()
+                    pygame.display.get_init()
+                    screen = pygame.display.set_mode(size, pygame.SCALED)
 
         if btn_fps_left.collidepoint((mx, my)):
             screen.blit(left_arrow_button[1], btn_fps_left)
@@ -553,7 +680,8 @@ def save_load(save):
 
 
 def play():
-    screen = pygame.display.set_mode(size, pygame.SCALED)
+    global screen
+    #screen = pygame.display.set_mode(size, pygame.SCALED)
     # The loop will carry on until the user exit the game (e.g. clicks the close button).
     playing = True
     scroll = [0, 0]
