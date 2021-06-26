@@ -1,21 +1,22 @@
 import threading
 import time
 import pygame
+from resources import Resources
 
-
-class Player(pygame.sprite.Sprite):
+class Player():
 
     def __init__(self, x, y):
-        pygame.sprite.Sprite.__init__(self)
+        image_resources = Resources().get_player()
+        #pygame.sprite.Sprite.__init__(self)
         self.x = x
         self.y = y
         self.health = 100
         self.speed = 2
         self.index = 0
-        self.images_idle = []
-        self.images_right = []
+        self.images_idle = image_resources[0]
+        self.images_right = image_resources[1]
         self.images_left = []
-        self.load_sprites()
+        #self.load_sprites()
         self.image = self.images_idle[self.index]
         self.hitbox = 0
         self.inventory = []
@@ -29,56 +30,56 @@ class Player(pygame.sprite.Sprite):
 
         #self.image = pygame.image.load('player.png').convert_alpha()
 
-    def load_sprites(self):
-        self.images_idle.append(pygame.image.load('images/Player/Minotaur_01_Idle_000.png').convert_alpha())
-        self.images_idle.append(pygame.image.load('images/Player/Minotaur_01_Idle_001.png').convert_alpha())
-        self.images_idle.append(pygame.image.load('images/Player/Minotaur_01_Idle_002.png').convert_alpha())
-        self.images_idle.append(pygame.image.load('images/Player/Minotaur_01_Idle_003.png').convert_alpha())
-        self.images_idle.append(pygame.image.load('images/Player/Minotaur_01_Idle_004.png').convert_alpha())
-        self.images_idle.append(pygame.image.load('images/Player/Minotaur_01_Idle_005.png').convert_alpha())
-        self.images_idle.append(pygame.image.load('images/Player/Minotaur_01_Idle_006.png').convert_alpha())
-        self.images_idle.append(pygame.image.load('images/Player/Minotaur_01_Idle_007.png').convert_alpha())
-        self.images_idle.append(pygame.image.load('images/Player/Minotaur_01_Idle_008.png').convert_alpha())
-        self.images_idle.append(pygame.image.load('images/Player/Minotaur_01_Idle_009.png').convert_alpha())
-        self.images_idle.append(pygame.image.load('images/Player/Minotaur_01_Idle_010.png').convert_alpha())
-        self.images_idle.append(pygame.image.load('images/Player/Minotaur_01_Idle_011.png').convert_alpha())
+    #def load_sprites(self):
+        #self.images_idle.append(pygame.image.load('images/Player/Minotaur_01_Idle_000.png').convert_alpha())
+        #self.images_idle.append(pygame.image.load('images/Player/Minotaur_01_Idle_001.png').convert_alpha())
+        #self.images_idle.append(pygame.image.load('images/Player/Minotaur_01_Idle_002.png').convert_alpha())
+        #self.images_idle.append(pygame.image.load('images/Player/Minotaur_01_Idle_003.png').convert_alpha())
+        #self.images_idle.append(pygame.image.load('images/Player/Minotaur_01_Idle_004.png').convert_alpha())
+        #self.images_idle.append(pygame.image.load('images/Player/Minotaur_01_Idle_005.png').convert_alpha())
+        #self.images_idle.append(pygame.image.load('images/Player/Minotaur_01_Idle_006.png').convert_alpha())
+        #self.images_idle.append(pygame.image.load('images/Player/Minotaur_01_Idle_007.png').convert_alpha())
+        #self.images_idle.append(pygame.image.load('images/Player/Minotaur_01_Idle_008.png').convert_alpha())
+        #self.images_idle.append(pygame.image.load('images/Player/Minotaur_01_Idle_009.png').convert_alpha())
+        #self.images_idle.append(pygame.image.load('images/Player/Minotaur_01_Idle_010.png').convert_alpha())
+        #self.images_idle.append(pygame.image.load('images/Player/Minotaur_01_Idle_011.png').convert_alpha())
 
-        self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_000.png').convert_alpha())
-        self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_000.png').convert_alpha())
-        self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_001.png').convert_alpha())
-        self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_001.png').convert_alpha())
-        self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_002.png').convert_alpha())
-        self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_002.png').convert_alpha())
-        self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_003.png').convert_alpha())
-        self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_003.png').convert_alpha())
-        self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_004.png').convert_alpha())
-        self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_004.png').convert_alpha())
-        self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_005.png').convert_alpha())
-        self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_005.png').convert_alpha())
-        self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_006.png').convert_alpha())
-        self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_006.png').convert_alpha())
-        self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_007.png').convert_alpha())
-        self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_007.png').convert_alpha())
-        self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_008.png').convert_alpha())
-        self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_008.png').convert_alpha())
-        self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_009.png').convert_alpha())
-        self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_009.png').convert_alpha())
-        self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_010.png').convert_alpha())
-        self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_010.png').convert_alpha())
-        self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_011.png').convert_alpha())
-        self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_011.png').convert_alpha())
-        self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_012.png').convert_alpha())
-        self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_012.png').convert_alpha())
-        self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_013.png').convert_alpha())
-        self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_013.png').convert_alpha())
-        self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_014.png').convert_alpha())
-        self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_014.png').convert_alpha())
-        self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_015.png').convert_alpha())
-        self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_015.png').convert_alpha())
-        self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_016.png').convert_alpha())
-        self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_016.png').convert_alpha())
-        self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_017.png').convert_alpha())
-        self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_017.png').convert_alpha())
+        #self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_000.png').convert_alpha())
+        #self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_000.png').convert_alpha())
+        #self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_001.png').convert_alpha())
+        #self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_001.png').convert_alpha())
+        #self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_002.png').convert_alpha())
+        #self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_002.png').convert_alpha())
+        #self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_003.png').convert_alpha())
+        #self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_003.png').convert_alpha())
+        #self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_004.png').convert_alpha())
+        #self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_004.png').convert_alpha())
+        #self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_005.png').convert_alpha())
+        #self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_005.png').convert_alpha())
+        #self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_006.png').convert_alpha())
+        #self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_006.png').convert_alpha())
+        #self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_007.png').convert_alpha())
+        #self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_007.png').convert_alpha())
+        #self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_008.png').convert_alpha())
+        #self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_008.png').convert_alpha())
+        #self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_009.png').convert_alpha())
+        #self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_009.png').convert_alpha())
+        #self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_010.png').convert_alpha())
+        #self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_010.png').convert_alpha())
+        #self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_011.png').convert_alpha())
+        #self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_011.png').convert_alpha())
+        #self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_012.png').convert_alpha())
+        #self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_012.png').convert_alpha())
+        #self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_013.png').convert_alpha())
+        #self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_013.png').convert_alpha())
+        #self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_014.png').convert_alpha())
+        #self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_014.png').convert_alpha())
+        #self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_015.png').convert_alpha())
+        #self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_015.png').convert_alpha())
+        #self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_016.png').convert_alpha())
+        #self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_016.png').convert_alpha())
+        #self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_017.png').convert_alpha())
+        #self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_017.png').convert_alpha())
 
     def move(self, x, y):
         self.x = x
