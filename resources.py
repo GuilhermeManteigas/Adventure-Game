@@ -54,6 +54,11 @@ class Resources:
                        pygame.image.load('images/Entities/tree/tree3.png').convert_alpha(),
                        pygame.image.load('images/Entities/tree/tree4.png').convert_alpha()]
 
+        images[201] = [pygame.image.load('images/Entities/cactus/cactus1.png').convert_alpha(),
+                       pygame.image.load('images/Entities/cactus/cactus2.png').convert_alpha(),
+                       pygame.image.load('images/Entities/cactus/cactus3.png').convert_alpha(),
+                       pygame.image.load('images/Entities/cactus/cactus4.png').convert_alpha()]
+
         ############### Drops ##############################
         images[400] = [pygame.image.load('images/Drops/wood/wood1.png').convert_alpha(),
                        pygame.image.load('images/Drops/wood/wood2.png').convert_alpha(),

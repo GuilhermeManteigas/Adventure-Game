@@ -7,27 +7,16 @@ import threading
 import time
 from resources import Resources
 from drop import Drop
-from entity import Entity
 from options import Options
 from worldloader import Worldloader
 import random
-import numpy as np
-import scipy.misc as smp
-from PIL import Image
 
 
 os.environ["SDL_VIDEO_CENTERED"] = "1"
 pygame.init()
 
 size = (1280, 720)
-#screen = pygame.display.set_mode(size, pygame.SCALED | pygame.RESIZABLE) #pygame.FULLSCREEN
-#screen = pygame.display.set_mode(size, pygame.FULLSCREEN)
-#screen = pygame.display.set_mode(size, pygame.RESIZABLE | pygame.SCALED)
-
-
 screen = pygame.display.set_mode(size, pygame.SCALED)
-
-#screen = pygame.display.set_mode(size)
 pygame.display.set_caption("Adventure Game")
 
 black = (0, 0, 0)
@@ -38,13 +27,12 @@ night_value = 0
 night_filter = pygame.Surface(size)
 night_filter.fill((0, 0, 0))
 game_days = 0
-Game_Map_Size = 30
 Game_Tick = 0.1
 game_running = True
 # The clock will be used to control how fast the screen updates
 clock = pygame.time.Clock()
 # Player declaration
-player = Player(2000, 2000)
+
 
 # Define some colors
 BLACK = (0, 0, 0)
@@ -53,9 +41,8 @@ GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 
-world_size = 500
-world = WorldGenerator(world_size, world_size).get_world()
-drop_map = []
+world_size = 300
+
 drop_map_section = []
 world_section = []
 Cube_Size = 30
@@ -67,31 +54,12 @@ mouse_position = (0, 0)
 image_resources = Resources().get_images()
 
 options = Options()
+
 world_loader = Worldloader()
+
 
 if options.fullscreen:
     screen = pygame.display.set_mode(size, pygame.SCALED | pygame.FULLSCREEN)
-
-def map_to_img(world):
-    # Create a 1024x1024x3 array of 8 bit unsigned integers
-    data = np.zeros((len(world), len(world), 3), dtype=np.uint8)
-
-    for x in range(len(world)):
-        for y in range(len(world)):
-            if world[x][y].id == 1:
-                data[x, y] = [0, 255, 0]
-
-
-    #for i in world:
-        #if i.id == 1:
-            #data[512, 512] = [0, 255, 0]
-
-    #data[512, 512] = [254, 0, 0]  # Makes the middle pixel red
-    #data[512, 513] = [0, 0, 255]  # Makes the next pixel blue
-
-    #img = Image.fromarray(data)  # Create a PIL image
-    #img.show()  # View in default viewer
-    return Image.fromarray(data)
 
 
 def main_menu():
@@ -168,18 +136,13 @@ def main_menu():
 
         clock.tick(60)
 
+
 def save_selector_menu():
     bg = pygame.image.load('images/Menu/bg.jpg').convert()
-    play_btn = [pygame.image.load('images/Menu/play1.png').convert_alpha(),pygame.image.load('images/Menu/play2.png').convert_alpha()]
+    play_btn = [pygame.image.load('images/Menu/play1.png').convert_alpha(), pygame.image.load('images/Menu/play2.png').convert_alpha()]
 
     #world_loader.load()
 
-    #back_button = [pygame.image.load('images/Menu/back_button1.png').convert_alpha(),
-    #               pygame.image.load('images/Menu/back_button2.png').convert_alpha()]
-    #left_arrow_button = [pygame.image.load('images/Menu/left_arrow1.png').convert_alpha(),
-    #                     pygame.image.load('images/Menu/left_arrow2.png').convert_alpha()]
-    #right_arrow_button = [pygame.image.load('images/Menu/right_arrow1.png').convert_alpha(),
-    #                      pygame.image.load('images/Menu/right_arrow2.png').convert_alpha()]
     x = 0
     global screen
     while True:
@@ -270,10 +233,6 @@ def save_selector_menu():
 
 
 
-
-
-
-
         if btn_save1.collidepoint((mx, my)):
             btn_save1_inflated = pygame.Rect(btn_save1.x - 1, btn_save1.y - 1, btn_save1.width + 2, btn_save1.height + 2)
             pygame.draw.rect(screen, (255, 255, 255), btn_save1_inflated, 2)
@@ -282,11 +241,11 @@ def save_selector_menu():
             if click:
                 if world_loader.worlds[0] is None:
                     world_loader.world_in_use = 0
-                    play()
+                    play(None)
                 else:
-                    save_load(world_loader.worlds[0])
+                    #save_load(world_loader.worlds[0])
                     world_loader.world_in_use = 0
-                    play()
+                    play(world_loader.worlds[0])
 
         if btn_save2.collidepoint((mx, my)):
             btn_save1_inflated = pygame.Rect(btn_save2.x - 1, btn_save2.y - 1, btn_save2.width + 2, btn_save2.height + 2)
@@ -296,11 +255,11 @@ def save_selector_menu():
             if click:
                 if world_loader.worlds[1] is None:
                     world_loader.world_in_use = 1
-                    play()
+                    play(None)
                 else:
-                    save_load(world_loader.worlds[1])
+                    #save_load(world_loader.worlds[1])
                     world_loader.world_in_use = 1
-                    play()
+                    play(world_loader.worlds[1])
 
         if btn_save3.collidepoint((mx, my)):
             btn_save1_inflated = pygame.Rect(btn_save3.x - 1, btn_save3.y - 1, btn_save3.width + 2, btn_save3.height + 2)
@@ -310,11 +269,11 @@ def save_selector_menu():
             if click:
                 if world_loader.worlds[2] is None:
                     world_loader.world_in_use = 2
-                    play()
+                    play(None)
                 else:
-                    save_load(world_loader.worlds[2])
+                    #save_load(world_loader.worlds[2])
                     world_loader.world_in_use = 2
-                    play()
+                    play(world_loader.worlds[2])
 
         if btn_save4.collidepoint((mx, my)):
             btn_save1_inflated = pygame.Rect(btn_save4.x - 1, btn_save4.y - 1, btn_save4.width + 2, btn_save4.height + 2)
@@ -664,22 +623,26 @@ def options_menu():
         clock.tick(60)
 
 
-def save_load(save):
-    global world
-    global drop_map
-    world = copy.deepcopy(save[0])
-    player.x = int(save[1][0])
-    player.y = int(save[1][1])
-    player.health = int(save[1][2])
-    player.inventory = save[1][3]
-    player.inventory_full = save[1][4]
-    drop_map = save[2]
+def play(game_save):
+    if game_save is None:
+        world = WorldGenerator(world_size, world_size).get_world()
+        player = Player(2000, 2000)
+        drop_map = []
+    else:
+        print("1")
+        world = game_save[0]#copy.deepcopy(game_save[0])
+        print("2")
+        player = Player(2000, 2000)
+        player.x = int(game_save[1][0])
+        player.y = int(game_save[1][1])
+        player.health = int(game_save[1][2])
+        player.inventory = game_save[1][3]
+        player.inventory_full = game_save[1][4]
+        print("3")
+        drop_map = game_save[2]
+        print("4")
 
 
-
-
-
-def play():
     global screen
     #screen = pygame.display.set_mode(size, pygame.SCALED)
     # The loop will carry on until the user exit the game (e.g. clicks the close button).
@@ -689,12 +652,13 @@ def play():
 
     def update_world_section():
         global world_section
+        map_size = len(world)
         while True:
             temp_world = []
 
             for x in range(int(player.x / 30) - 30, int(player.x / 30) + 30):
                 for y in range(int(player.y/30) - 30, int(player.y/30) + 30):
-                    if 0 <= x < world_size - 1 and 0 <= y < world_size - 1:
+                    if 0 <= x < map_size - 1 and 0 <= y < map_size - 1:
                         temp_world.append(world[x][y])
 
             world_section = temp_world[:]
@@ -784,20 +748,22 @@ def play():
 
 
     def collision_checker(x, y):
+        map_size = len(world)
 
         if world[int(x / 30)][int(y / 30)].entity.collision:
             pass
         elif world[int(x/30)][int(y/30)].collision:
             pass
-        elif int(x/30) < 25 or int(y/30) < 20 or int(x/30) > world_size - 25 or int(y/30) > world_size - 20:
+        elif int(x/30) < 25 or int(y/30) < 20 or int(x/30) > map_size - 25 or int(y/30) > map_size - 20:
             pass
         else:
             player.move(x, y)
 
 
     def block_face_checker():
-        for x in range(world_size-1):
-            for y in range(world_size-1):
+        map_size = len(world)
+        for x in range(map_size-1):
+            for y in range(map_size-1):
                 if world[x][y].height == 1:
 
                     #   O X O    O O O
@@ -857,7 +823,7 @@ def play():
 
 
     def drop_timeout_remover():
-        global drop_map
+        #global drop_map
         while True:
             #Remove uncollected drops
             for x in reversed(drop_map):
@@ -868,7 +834,7 @@ def play():
 
 
     def drop_manager():
-        global drop_map
+        #global drop_map
         global drop_map_section
         while True:
             # Update list of visible drops
