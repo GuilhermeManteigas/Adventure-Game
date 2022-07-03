@@ -34,7 +34,8 @@ class Worldloader:
                 print("2")
                 self.worlds_minimaps[0] = self.map_to_img(self.worlds[0][0], 0)
                 print("3")
-        except:
+        except: #pickle.UnpicklingError:
+            #print(pickle.UnpicklingError)
             pass
         try:
             filename = os.getenv('APPDATA') + "\\" + GAME_NAME + "\world1.save"
@@ -111,7 +112,7 @@ class Worldloader:
         os.makedirs(os.path.dirname(filename), exist_ok=True)
         with open(filename, "wb") as f:
             save = [world, p, drop_map, today.strftime("%d/%m/%Y")]
-            pickle.dump(save, f)
+            pickle.dump(save, f, protocol=pickle.HIGHEST_PROTOCOL)
 
     def map_to_img(self, world, num):
         filename = os.getenv('APPDATA') + "\\" + GAME_NAME + "\minimap" + str(num) + ".png"
@@ -127,6 +128,8 @@ class Worldloader:
                         data[x, y] = [252, 198, 3]
                     elif world[x][y].id == 3:
                         data[x, y] = [3, 190, 252]
+                    elif world[x][y].id == 4:
+                        data[x, y] = [0, 0, 0]
 
             Image.fromarray(data).save(filename)
 

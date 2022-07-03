@@ -16,8 +16,9 @@ os.environ["SDL_VIDEO_CENTERED"] = "1"
 pygame.init()
 
 size = (1280, 720)
-screen = pygame.display.set_mode(size, pygame.SCALED)
+screen = pygame.display.set_mode(size, pygame.SCALED | pygame.DOUBLEBUF)
 pygame.display.set_caption("Adventure Game")
+pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN, pygame.MOUSEBUTTONDOWN])
 
 black = (0, 0, 0)
 
@@ -29,6 +30,7 @@ night_filter.fill((0, 0, 0))
 game_days = 0
 Game_Tick = 0.1
 game_running = True
+game_paused = False
 # The clock will be used to control how fast the screen updates
 clock = pygame.time.Clock()
 # Player declaration
@@ -45,6 +47,7 @@ world_size = 300
 
 drop_map_section = []
 world_section = []
+world_section_entities = []
 Cube_Size = 30
 
 true_scroll = [0, 0]
@@ -59,7 +62,7 @@ world_loader = Worldloader()
 
 
 if options.fullscreen:
-    screen = pygame.display.set_mode(size, pygame.SCALED | pygame.FULLSCREEN)
+    screen = pygame.display.set_mode(size, pygame.SCALED | pygame.FULLSCREEN | pygame.DOUBLEBUF)
 
 
 def main_menu():
@@ -156,8 +159,6 @@ def save_selector_menu():
                     click = True
             if e.type == pygame.QUIT:
                 return
-
-
 
 
 
@@ -285,7 +286,7 @@ def save_selector_menu():
                     world_loader.world_in_use = 3
                     play()
                 else:
-                    save_load(world_loader.worlds[3])
+                    #save_load(world_loader.worlds[3])
                     world_loader.world_in_use = 3
                     play()
 
@@ -299,7 +300,7 @@ def save_selector_menu():
                     world_loader.world_in_use = 4
                     play()
                 else:
-                    save_load(world_loader.worlds[4])
+                    #save_load(world_loader.worlds[4])
                     world_loader.world_in_use = 4
                     play()
 
@@ -313,7 +314,7 @@ def save_selector_menu():
                     world_loader.world_in_use = 5
                     play()
                 else:
-                    save_load(world_loader.worlds[5])
+                    #save_load(world_loader.worlds[5])
                     world_loader.world_in_use = 5
                     play()
 
@@ -327,7 +328,7 @@ def save_selector_menu():
                     world_loader.world_in_use = 6
                     play()
                 else:
-                    save_load(world_loader.worlds[6])
+                    #save_load(world_loader.worlds[6])
                     world_loader.world_in_use = 6
                     play()
 
@@ -341,7 +342,7 @@ def save_selector_menu():
                     world_loader.world_in_use = 7
                     play()
                 else:
-                    save_load(world_loader.worlds[7])
+                    #save_load(world_loader.worlds[7])
                     world_loader.world_in_use = 7
                     play()
 
@@ -440,7 +441,11 @@ def options_menu():
                 if e.button == 1:
                     click = True
             if e.type == pygame.QUIT:
-                return
+                pygame.quit()
+                print("quit from options")
+                #return
+
+
 
         FPS_FONT = pygame.font.SysFont("franklingothicmedium", 25)
         color = pygame.Color("black")
@@ -623,24 +628,94 @@ def options_menu():
         clock.tick(60)
 
 
+def esc_menu():
+    open = True
+    bg = pygame.image.load('images/Menu/bg.jpg').convert()
+    button = [pygame.image.load('images/Menu/button1.png').convert_alpha(),
+              pygame.image.load('images/Menu/button2.png').convert_alpha()]
+    x = 0
+    global screen
+    while open:
+        click = False
+
+        FPS_FONT = pygame.font.SysFont("franklingothicmedium", 60)
+        color = pygame.Color("black")
+
+        rel_x = x % bg.get_rect().width
+        screen.blit(bg, (rel_x - bg.get_rect().width, 0))
+        if rel_x < size[0]:
+            screen.blit(bg, (rel_x, 0))
+        x -= 1
+
+        mx, my = pygame.mouse.get_pos()
+
+        text_start = FPS_FONT.render("Start", True, color)
+        text_options = FPS_FONT.render("Options", True, color)
+        text_exit = FPS_FONT.render("Exit", True, color)
+
+        btn_start = pygame.Rect(450, 300, 400, 100)
+        btn_options = pygame.Rect(450, 420, 400, 100)
+        btn_exit = pygame.Rect(450, 540, 400, 100)
+
+        screen.blit(button[0], btn_start)
+        screen.blit(button[0], btn_options)
+        screen.blit(button[0], btn_exit)
+
+        if btn_start.collidepoint((mx, my)):
+            screen.blit(button[1], btn_start)
+            if click:
+                pass
+                #save_selector_menu()
+                # play()
+        if btn_options.collidepoint((mx, my)):
+            screen.blit(button[1], btn_options)
+            if click:
+                pass
+                #options_menu()
+        if btn_exit.collidepoint((mx, my)):
+            screen.blit(button[1], btn_exit)
+            if click:
+                open = False
+
+        a, b = btn_start.center
+        btn_center = (a, b - 15)
+        text_rect = text_start.get_rect(center=btn_center)
+        screen.blit(text_start, text_rect)
+
+        a, b = btn_options.center
+        btn_center = (a, b - 15)
+        text_rect = text_options.get_rect(center=btn_center)
+        screen.blit(text_options, text_rect)
+
+        a, b = btn_exit.center
+        btn_center = (a, b - 15)
+        text_rect = text_exit.get_rect(center=btn_center)
+        screen.blit(text_exit, text_rect)
+
+        pygame.display.flip()
+
+        clock.tick(60)
+
+
+
 def play(game_save):
     if game_save is None:
         world = WorldGenerator(world_size, world_size).get_world()
         player = Player(2000, 2000)
         drop_map = []
     else:
-        print("1")
+        #print("1")
         world = game_save[0]#copy.deepcopy(game_save[0])
-        print("2")
+        #print("2")
         player = Player(2000, 2000)
         player.x = int(game_save[1][0])
         player.y = int(game_save[1][1])
         player.health = int(game_save[1][2])
         player.inventory = game_save[1][3]
         player.inventory_full = game_save[1][4]
-        print("3")
+        #print("3")
         drop_map = game_save[2]
-        print("4")
+        #print("4")
 
 
     global screen
@@ -653,42 +728,72 @@ def play(game_save):
     def update_world_section():
         global world_section
         map_size = len(world)
-        while True:
-            temp_world = []
+        while playing:
+            start_time = time.time()
 
-            for x in range(int(player.x / 30) - 30, int(player.x / 30) + 30):
-                for y in range(int(player.y/30) - 30, int(player.y/30) + 30):
-                    if 0 <= x < map_size - 1 and 0 <= y < map_size - 1:
-                        temp_world.append(world[x][y])
+            #temp_world = []
 
-            world_section = temp_world[:]
+            #for x in range(int(player.x / 30) - 30, int(player.x / 30) + 30):
+                #for y in range(int(player.y/30) - 30, int(player.y/30) + 30):
+                    #if 0 <= x < map_size - 1 and 0 <= y < map_size - 1:
+                        #temp_world.append(world[x][y])
+
+            # world_section = temp_world[:]
+
+
+            world_section = [world[x][y] for x in range(int(player.x / 30) - 30, int(player.x / 30) + 30) for y in range(int(player.y/30) - 30, int(player.y/30) + 30) if 0 <= x < map_size - 1 and 0 <= y < map_size - 1 ]
+
             time.sleep(Game_Tick*5)
+            #print("--- Update world: %s seconds ---" % (time.time() - start_time))
 
 
     def draw_world():
+        global world_section_entities
+        temp_world_section_entities = []
         for i in world_section:
             screen.blit(image_resources[i.id][i.block_face], (i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1]))
             #i.hitbox = pygame.Rect((i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1]), (Cube_Size, Cube_Size))
+            if i.entity.id != 0:
+                temp_world_section_entities.append(i)
+        world_section_entities = temp_world_section_entities[:]
+
+
+    def entities_update_handler():
+        while game_running:
+            entity_remover()
+            for i in world_section_entities:
+                if i.entity.id != 0:
+                    i.entity.update(game_days)
+                    i.entity.hitbox = pygame.Rect((i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1]), (Cube_Size, Cube_Size))
+
+            time.sleep(0.01)
 
 
     def draw_entities():
+        start_time = time.time()
         light = image_resources[600][0]
         a, b = light.get_size()
         mouse_x, mouse_y = mouse_position
 
         if night_value > 0:
             night_filter.fill((night_value, night_value, night_value))
-
-        entity_remover()
-        for i in world_section:
-
+        #print("--- Draw Entities 1: %s seconds ---" % (time.time() - start_time))
+        start_time = time.time()
+        #entity_remover()
+        #print("--- Draw Entities 2: %s seconds ---" % (time.time() - start_time))
+        start_time = time.time()
+        for i in world_section_entities:
                 if i.entity.id != 0:
                     if i.x == mouse_x and i.y == mouse_y:
                         # Draw Marker
                         screen.blit(image_resources[601][0], (i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1]))
-                    i.entity.update(game_days)
+                    #print("--- Draw Entities 2.1: %s seconds ---" % (time.time() - start_time))
+                    start_time = time.time()
+                    #i.entity.update(game_days)
                     screen.blit(image_resources[i.entity.id][i.entity.entity_face], (i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1] - image_resources[i.entity.id][i.entity.entity_face].get_height() + Cube_Size))
-                    i.entity.hitbox = pygame.Rect((i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1]), (Cube_Size, Cube_Size))
+                    #i.entity.hitbox = pygame.Rect((i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1]), (Cube_Size, Cube_Size))
+                    #print("--- Draw Entities 2.2: %s seconds ---" % (time.time() - start_time))
+                    start_time = time.time()
                     if i.entity.health < i.entity.max_health:
                         # Draw grey back
                         pygame.draw.rect(screen, (30, 30, 30), (i.x * Cube_Size - scroll[0] - 2, i.y * Cube_Size - scroll[1] + Cube_Size + 10 - 2, 30 + 4, 5 + 4))
@@ -697,9 +802,13 @@ def play(game_save):
                             pygame.draw.rect(screen, (127, 255, 0), (i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1] + Cube_Size + 10, i.entity.health / 3.3, 5))
                         else:
                             pygame.draw.rect(screen, (255, 0, 0), (i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1] + Cube_Size + 10, i.entity.health / 3.3, 5))
-
+                    #print("--- Draw Entities 2.3: %s seconds ---" % (time.time() - start_time))
+                    start_time = time.time()
                     if night_value > 0:
                         night_filter.blit(light, (i.x * Cube_Size - scroll[0] - a/2, i.y * Cube_Size - scroll[1] - b/2))
+                    #print("--- Draw Entities 2.4: %s seconds ---" % (time.time() - start_time))
+                    start_time = time.time()
+        #print("--- Draw Entities 3: %s seconds ---" % (time.time() - start_time))
 
 
     def draw_drops():
@@ -708,19 +817,14 @@ def play(game_save):
 
 
     def show_fps(window, clock):
-        FPS_FONT = pygame.font.SysFont("Verdana", 10)
+        FPS_FONT = pygame.font.SysFont("Verdana", 15)
         color = pygame.Color("white")
-        if options.fps and options.coords:
+        if options.fps:
             fps_overlay = FPS_FONT.render(str(int(clock.get_fps())), True, color)
-            window.blit(fps_overlay, (55, 0))
-            coors_overlay = FPS_FONT.render(str((int(player.x / Cube_Size), int(player.y / Cube_Size))), True, color)
-            window.blit(coors_overlay, (0, 0))
-        elif options.fps:
-            fps_overlay = FPS_FONT.render(str(int(clock.get_fps())), True, color)
-            window.blit(fps_overlay, (55, 0))
-        elif options.coords:
-            coors_overlay = FPS_FONT.render(str((int(player.x / Cube_Size), int(player.y / Cube_Size))), True, color)
-            window.blit(coors_overlay, (0, 0))
+            window.blit(fps_overlay, (1240, 0))
+        if options.coords:
+            coors_overlay = FPS_FONT.render(str("Coordinates :" + str((int(player.x / Cube_Size), int(player.y / Cube_Size)))), True, color)
+            window.blit(coors_overlay, (5, 0))
 
 
 
@@ -749,15 +853,24 @@ def play(game_save):
 
     def collision_checker(x, y):
         map_size = len(world)
+        result = False
 
         if world[int(x / 30)][int(y / 30)].entity.collision:
             pass
         elif world[int(x/30)][int(y/30)].collision:
+            #if world[int(x/30)][int(player.y/30)].collision:
+                #player.move(x, player.y)
+            #if world[int(player.x/30)][int(y/30)].collision:
+                #player.move(player.x, y)
             pass
         elif int(x/30) < 25 or int(y/30) < 20 or int(x/30) > map_size - 25 or int(y/30) > map_size - 20:
             pass
         else:
             player.move(x, y)
+            result = True
+
+        return result
+
 
 
     def block_face_checker():
@@ -823,8 +936,7 @@ def play(game_save):
 
 
     def drop_timeout_remover():
-        #global drop_map
-        while True:
+        while game_running:
             #Remove uncollected drops
             for x in reversed(drop_map):
                 if game_days - x.creation_day > 1:
@@ -836,7 +948,7 @@ def play(game_save):
     def drop_manager():
         #global drop_map
         global drop_map_section
-        while True:
+        while game_running:
             # Update list of visible drops
             temp_drop = []
             for i in drop_map:
@@ -873,7 +985,7 @@ def play(game_save):
 
     def drop_collection_manager():
         global drop_map_section
-        while True:
+        while game_running:
             # Move drops to player
             for i in drop_map_section:
                 distance = (((player.x - i.x) ** 2) + ((player.y - i.y) ** 2)) ** 0.5
@@ -921,20 +1033,43 @@ def play(game_save):
 
 
     def player_movement_handler():
+        previous_run_time = time.time()
+        time.time() - previous_run_time
+
         while game_running:
+            delay = time.time() - previous_run_time
+            adjust_delay = player.speed * (delay - (Game_Tick / 15)) / (Game_Tick / 15)
+            previous_run_time = time.time()
+
             keys = pygame.key.get_pressed()
-            if keys[pygame.K_a]:
-                #global screen
-                #screen = pygame.display.set_mode(size, pygame.SCALED | pygame.NOFRAME)
-                collision_checker(player.x - player.speed, player.y)
+            if keys[pygame.K_a] and keys[pygame.K_w]:
+                if not collision_checker(player.x - int(player.speed * 90 / 100) - adjust_delay, player.y - int(player.speed * 90 / 100) - adjust_delay):
+                    collision_checker(player.x - int(player.speed * 90 / 100) - adjust_delay, player.y)
+                    collision_checker(player.x, player.y - int(player.speed * 90 / 100) - adjust_delay)
+            elif keys[pygame.K_a] and keys[pygame.K_s]:
+                if not collision_checker(player.x - int(player.speed * 90 / 100) - adjust_delay, player.y + int(player.speed * 90 / 100) + adjust_delay):
+                    collision_checker(player.x - int(player.speed * 90 / 100) - adjust_delay, player.y)
+                    collision_checker(player.x, player.y + int(player.speed * 90 / 100) + adjust_delay)
+            elif keys[pygame.K_d] and keys[pygame.K_w]:
+                if not collision_checker(player.x + int(player.speed * 90 / 100) + adjust_delay, player.y - int(player.speed * 90 / 100) - adjust_delay):
+                    collision_checker(player.x + int(player.speed * 90 / 100) + adjust_delay, player.y)
+                    collision_checker(player.x, player.y - int(player.speed * 90 / 100) - adjust_delay)
+            elif keys[pygame.K_d] and keys[pygame.K_s]:
+                if not collision_checker(player.x + int(player.speed * 90 / 100) + adjust_delay, player.y + int(player.speed * 90 / 100) + adjust_delay):
+                    collision_checker(player.x + int(player.speed * 90 / 100) + adjust_delay, player.y)
+                    collision_checker(player.x, player.y + int(player.speed * 90 / 100) + adjust_delay)
+
+            elif keys[pygame.K_a]:
+                collision_checker(player.x - player.speed - adjust_delay, player.y)
             elif keys[pygame.K_d]:
-                collision_checker(player.x + player.speed, player.y)
-            if keys[pygame.K_w]:
-                collision_checker(player.x, player.y - player.speed)
-            if keys[pygame.K_s]:
-                collision_checker(player.x, player.y + player.speed)
+                collision_checker(player.x + player.speed + adjust_delay, player.y)
+            elif keys[pygame.K_w]:
+                collision_checker(player.x, player.y - player.speed - adjust_delay)
+            elif keys[pygame.K_s]:
+                collision_checker(player.x, player.y + player.speed + adjust_delay)
 
             time.sleep(Game_Tick/15)
+            #print(pygame.time.get_ticks() - start_time)
 
 
     def mouse_movement_handler():
@@ -963,9 +1098,8 @@ def play(game_save):
 
             time.sleep(0.01)
 
-
-
-
+    entities_update = threading.Thread(target=entities_update_handler)
+    entities_update.start()
 
     player_movement = threading.Thread(target=player_movement_handler)
     player_movement.start()
@@ -1013,11 +1147,31 @@ def play(game_save):
         for e in pygame.event.get():
             if e.type == pygame.KEYDOWN:
                 if e.key == pygame.K_F2:
-                    screen = pygame.display.set_mode(size, pygame.SCALED | pygame.FULLSCREEN)
-                    #night_filter = pygame.Surface(size)
+                    if options.fullscreen:
+                        options.update_fullscreen()
+                        screen = pygame.display.set_mode(size, pygame.SCALED | pygame.FULLSCREEN)
+                    else:
+                        #player_movement.start()
+                        #mouse_movement.start()
+                        #mouse_clicker.start()
+
+                        options.update_fullscreen()
+                        #pygame.display.quit()
+                        #pygame.display.get_init()
+                        #pygame.display.toggle_fullscreen()
+                        #os.environ["SDL_VIDEO_CENTERED"] = "1"
+                        screen = pygame.display.set_mode(size, pygame.SCALED)
+                    #screen = pygame.display.set_mode(size, pygame.SCALED | pygame.FULLSCREEN)
+                if e.key == pygame.K_ESCAPE:
+                    esc_menu()
+
             if e.type == pygame.QUIT:
+                global game_running
                 world_loader.save(world, player, drop_map)
+                print("world saved")
                 playing = False
+                game_running = False
+                pygame.quit()
 
         #screen.fill('white')
 
@@ -1028,6 +1182,7 @@ def play(game_save):
         scroll = true_scroll.copy()
         scroll[0] = int(scroll[0])
         scroll[1] = int(scroll[1])
+        #print(scroll)
         #print("--- A: %s seconds ---" % (time.time() - start_time))
 
         start_time = time.time()
@@ -1042,7 +1197,7 @@ def play(game_save):
         rect = player.image.get_rect()
         rect.center = player.x - scroll[0], player.y - scroll[1] - (player.image.get_height() - Cube_Size - 5)  #fixed the size because was messign up colisions now colision point is at feet
         player.hitbox = pygame.Rect(rect)
-        screen.blit(player.image, rect)
+        screen.blit(player.get_image(), rect)
         pygame.draw.rect(screen, RED, rect, 1)
         #print("--- Player: %s seconds ---" % (time.time() - start_time))
         #screen.blit(player.image, (player.x - scroll[0], player.y - scroll[1]))
@@ -1053,10 +1208,10 @@ def play(game_save):
         if night_value > 0:
             start_time = time.time()
             screen.blit(night_filter, (0, 0), special_flags=pygame.BLEND_RGBA_SUB)
-
+            #screen.blit(night_filter, (0, 0), special_flags=pygame.BLEND_SUB)
             #print("--- Night: %s seconds ---" % (time.time() - start_time))
 
-
+            #print(night_filter)
 
         pygame.display.flip()
 
@@ -1068,3 +1223,4 @@ main_menu()
 #play()
 
 pygame.quit()
+game_running = False

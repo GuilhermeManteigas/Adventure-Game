@@ -21,6 +21,7 @@ class Player():
         self.hitbox = 0
         self.inventory = []
         self.inventory_full = False
+        self.looking_direction = False
 
 
         player_movement = threading.Thread(target=self.idle)
@@ -81,7 +82,20 @@ class Player():
         #self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_017.png').convert_alpha())
         #self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_017.png').convert_alpha())
 
+    def get_image(self):
+        if self.looking_direction:
+            return pygame.transform.flip(self.image, True, False)
+        else:
+            return self.image
+            pass
+
     def move(self, x, y):
+        if self.x == x:
+            pass
+        elif self.x < x:
+            self.looking_direction = False
+        else:
+            self.looking_direction = True
         self.x = x
         self.y = y
         self.update_sprite()

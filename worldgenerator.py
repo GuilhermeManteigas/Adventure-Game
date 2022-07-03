@@ -84,6 +84,52 @@ class WorldGenerator:
                             block.height = 1
         print("--- Build desert: %s seconds ---" % (time.time() - start_time))
 
+        # Generate snow
+        start_time = time.time()
+        for i in range(30, height - 30):
+            for j in range(30, width - 30):
+                if random.randint(0, 4000) == 1:
+                    for y in range(i, i + 20):
+                        for x in range(j, j + 20):
+                            if 0 < y < height - 1 and 0 < x < width - 1:
+                                block = world[y][x]
+                                block.id = 4
+                                block.collision = False
+                                block.height = 1
+        print("--- Generate snow: %s seconds ---" % (time.time() - start_time))
+
+        # Build on snow
+        start_time = time.time()
+        for c in range(2, 100):
+            for i in range(height):
+                for j in range(width):
+                    if world[i][j].id == 4:
+
+                        block = world[i][j - 1]
+                        if block.id == 1 and random.randint(0, c) == 1 and j > 0:
+                            block.id = 4
+                            block.collision = False
+                            block.height = 1
+
+                        block = world[i][j + 1]
+                        if block.id == 1 and random.randint(0, c) == 1 and j < width - 1:
+                            block.id = 4
+                            block.collision = False
+                            block.height = 1
+
+                        block = world[i - 1][j]
+                        if block.id == 1 and random.randint(0, c) == 1 and i > 0:
+                            block.id = 4
+                            block.collision = False
+                            block.height = 1
+
+                        block = world[i + 1][j]
+                        if block.id == 1 and random.randint(0, c) == 1 and i < height - 1:
+                            block.id = 4
+                            block.collision = False
+                            block.height = 1
+        print("--- Build snow: %s seconds ---" % (time.time() - start_time))
+
         # Generate water
         start_time = time.time()
         for i in range(height):
@@ -153,6 +199,9 @@ class WorldGenerator:
                     block.entity.create_time = -5
                 elif block.id == 2 and random.randint(0, 100) == 1:
                     block.entity = Entity(201, i, j, True, 4, [True, 400])
+                    block.entity.create_time = -5
+                elif block.id == 4 and random.randint(0, 100) == 1:
+                    block.entity = Entity(202, i, j, True, 4, [True, 400])
                     block.entity.create_time = -5
         print("--- Generate Trees: %s seconds ---" % (time.time() - start_time))
 

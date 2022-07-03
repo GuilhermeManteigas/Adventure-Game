@@ -47,6 +47,22 @@ class Resources:
                      pygame.image.load('images/Blocks/sand/sand16.png').convert()]
         images[3] = [pygame.image.load('images/Blocks/water/water1.png').convert_alpha(),
                      pygame.image.load('images/Blocks/water/water2.png').convert_alpha()]
+        images[4] = [pygame.image.load('images/Blocks/snow/snow1.png').convert(),
+                     pygame.image.load('images/Blocks/snow/snow2.png').convert(),
+                     pygame.image.load('images/Blocks/snow/snow3.png').convert(),
+                     pygame.image.load('images/Blocks/snow/snow4.png').convert(),
+                     pygame.image.load('images/Blocks/snow/snow5.png').convert(),
+                     pygame.image.load('images/Blocks/snow/snow6.png').convert(),
+                     pygame.image.load('images/Blocks/snow/snow7.png').convert(),
+                     pygame.image.load('images/Blocks/snow/snow8.png').convert(),
+                     pygame.image.load('images/Blocks/snow/snow9.png').convert(),
+                     pygame.image.load('images/Blocks/snow/snow10.png').convert(),
+                     pygame.image.load('images/Blocks/snow/snow11.png').convert(),
+                     pygame.image.load('images/Blocks/snow/snow12.png').convert(),
+                     pygame.image.load('images/Blocks/snow/snow13.png').convert(),
+                     pygame.image.load('images/Blocks/snow/snow14.png').convert(),
+                     pygame.image.load('images/Blocks/snow/snow15.png').convert(),
+                     pygame.image.load('images/Blocks/snow/snow16.png').convert()]
 
         ############### Entities ##############################
         images[200] = [pygame.image.load('images/Entities/tree/tree1.png').convert_alpha(),
@@ -58,6 +74,11 @@ class Resources:
                        pygame.image.load('images/Entities/cactus/cactus2.png').convert_alpha(),
                        pygame.image.load('images/Entities/cactus/cactus3.png').convert_alpha(),
                        pygame.image.load('images/Entities/cactus/cactus4.png').convert_alpha()]
+
+        images[202] = [pygame.image.load('images/Entities/snowtree/tree1.png').convert_alpha(),
+                       pygame.image.load('images/Entities/snowtree/tree2.png').convert_alpha(),
+                       pygame.image.load('images/Entities/snowtree/tree3.png').convert_alpha(),
+                       pygame.image.load('images/Entities/snowtree/tree4.png').convert_alpha()]
 
         ############### Drops ##############################
         images[400] = [pygame.image.load('images/Drops/wood/wood1.png').convert_alpha(),

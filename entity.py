@@ -1,3 +1,5 @@
+import time
+
 
 class Entity:
     def __init__(self, id, x, y, collision, age, drop_list):
@@ -47,6 +49,9 @@ class Entity:
         #    self.drop = True
 
     def damage(self, points):
+        self.x += 50
         self.health -= points
         if self.health < 0:
             self.health = 0
+        time.sleep(0.1)
+        self.x -= 50
