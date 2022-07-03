@@ -1,5 +1,7 @@
 import copy
 import os
+import sys
+
 from worldgenerator import WorldGenerator
 from player import Player
 import pygame
@@ -247,6 +249,7 @@ def save_selector_menu():
                     #save_load(world_loader.worlds[0])
                     world_loader.world_in_use = 0
                     play(world_loader.worlds[0])
+                    break
 
         if btn_save2.collidepoint((mx, my)):
             btn_save1_inflated = pygame.Rect(btn_save2.x - 1, btn_save2.y - 1, btn_save2.width + 2, btn_save2.height + 2)
@@ -641,6 +644,11 @@ def esc_menu():
         FPS_FONT = pygame.font.SysFont("franklingothicmedium", 60)
         color = pygame.Color("black")
 
+        for e in pygame.event.get():
+            if e.type == pygame.MOUSEBUTTONDOWN:
+                if e.button == 1:
+                    click = True
+
         rel_x = x % bg.get_rect().width
         screen.blit(bg, (rel_x - bg.get_rect().width, 0))
         if rel_x < size[0]:
@@ -649,9 +657,9 @@ def esc_menu():
 
         mx, my = pygame.mouse.get_pos()
 
-        text_start = FPS_FONT.render("Start", True, color)
+        text_start = FPS_FONT.render("Resume", True, color)
         text_options = FPS_FONT.render("Options", True, color)
-        text_exit = FPS_FONT.render("Exit", True, color)
+        text_exit = FPS_FONT.render("Quit", True, color)
 
         btn_start = pygame.Rect(450, 300, 400, 100)
         btn_options = pygame.Rect(450, 420, 400, 100)
@@ -664,18 +672,18 @@ def esc_menu():
         if btn_start.collidepoint((mx, my)):
             screen.blit(button[1], btn_start)
             if click:
-                pass
-                #save_selector_menu()
-                # play()
+                return
         if btn_options.collidepoint((mx, my)):
             screen.blit(button[1], btn_options)
             if click:
-                pass
-                #options_menu()
+                options_menu()
         if btn_exit.collidepoint((mx, my)):
             screen.blit(button[1], btn_exit)
             if click:
-                open = False
+                pygame.quit()
+                #os.kill()
+                sys.exit()
+                #os.kill()
 
         a, b = btn_start.center
         btn_center = (a, b - 15)
@@ -723,6 +731,8 @@ def play(game_save):
     # The loop will carry on until the user exit the game (e.g. clicks the close button).
     playing = True
     scroll = [0, 0]
+    idle_animation_list = []
+    idle_animation_list.append(player)
 
 
     def update_world_section():
@@ -760,11 +770,12 @@ def play(game_save):
 
     def entities_update_handler():
         while game_running:
-            entity_remover()
-            for i in world_section_entities:
-                if i.entity.id != 0:
-                    i.entity.update(game_days)
-                    i.entity.hitbox = pygame.Rect((i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1]), (Cube_Size, Cube_Size))
+            if not game_paused:
+                entity_remover()
+                for i in world_section_entities:
+                    if i.entity.id != 0:
+                        i.entity.update(game_days)
+                        i.entity.hitbox = pygame.Rect((i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1]), (Cube_Size, Cube_Size))
 
             time.sleep(0.01)
 
@@ -937,10 +948,11 @@ def play(game_save):
 
     def drop_timeout_remover():
         while game_running:
-            #Remove uncollected drops
-            for x in reversed(drop_map):
-                if game_days - x.creation_day > 1:
-                    drop_map.remove(x)
+            if not game_paused:
+                #Remove uncollected drops
+                for x in reversed(drop_map):
+                    if game_days - x.creation_day > 1:
+                        drop_map.remove(x)
 
             time.sleep(10)
 
@@ -949,36 +961,37 @@ def play(game_save):
         #global drop_map
         global drop_map_section
         while game_running:
-            # Update list of visible drops
-            temp_drop = []
-            for i in drop_map:
-                if player.x - 900 < i.x < player.x + 900 and player.y - 900 < i.y < player.y + 900:
-                    temp_drop.append(i)
-            drop_map_section = temp_drop[:]
+            if not game_paused:
+                # Update list of visible drops
+                temp_drop = []
+                for i in drop_map:
+                    if player.x - 900 < i.x < player.x + 900 and player.y - 900 < i.y < player.y + 900:
+                        temp_drop.append(i)
+                drop_map_section = temp_drop[:]
 
 
-            # Stacks drops
-            temp_to_remove = []
-            for i in range(len(drop_map_section)):
-                for j in range(i + 1, len(drop_map_section)):
-                    a = drop_map_section[i]
-                    b = drop_map_section[j]
-                    if a.id == b.id:
-                        distance = (((a.x - b.x) ** 2) + ((a.y - b.y) ** 2)) ** 0.5
-                        player_distance_a = (((player.x - a.x) ** 2) + ((player.y - a.y) ** 2)) ** 0.5
-                        player_distance_b = (((player.x - b.x) ** 2) + ((player.y - b.y) ** 2)) ** 0.5
-                        if abs(distance) < 90 and abs(player_distance_a) > 220 and abs(player_distance_b) > 220:
-                            temp_to_remove.append([a, b])
+                # Stacks drops
+                temp_to_remove = []
+                for i in range(len(drop_map_section)):
+                    for j in range(i + 1, len(drop_map_section)):
+                        a = drop_map_section[i]
+                        b = drop_map_section[j]
+                        if a.id == b.id:
+                            distance = (((a.x - b.x) ** 2) + ((a.y - b.y) ** 2)) ** 0.5
+                            player_distance_a = (((player.x - a.x) ** 2) + ((player.y - a.y) ** 2)) ** 0.5
+                            player_distance_b = (((player.x - b.x) ** 2) + ((player.y - b.y) ** 2)) ** 0.5
+                            if abs(distance) < 90 and abs(player_distance_a) > 220 and abs(player_distance_b) > 220:
+                                temp_to_remove.append([a, b])
 
-            for i in reversed(temp_to_remove):
-                a, b = i
-                drop_map.append(Drop(b.x, b.y, b.id, a.quantity + b.quantity, a.creation_day))
-                drop_map.remove(b)
-                drop_map.remove(a)
+                for i in reversed(temp_to_remove):
+                    a, b = i
+                    drop_map.append(Drop(b.x, b.y, b.id, a.quantity + b.quantity, a.creation_day))
+                    drop_map.remove(b)
+                    drop_map.remove(a)
 
-                for x in reversed(temp_to_remove):
-                    if x[0] == a or x[1] == a or x[0] == b or x[1] == b:
-                        temp_to_remove.remove(x)
+                    for x in reversed(temp_to_remove):
+                        if x[0] == a or x[1] == a or x[0] == b or x[1] == b:
+                            temp_to_remove.remove(x)
 
             time.sleep(0.05)
 
@@ -986,29 +999,30 @@ def play(game_save):
     def drop_collection_manager():
         global drop_map_section
         while game_running:
-            # Move drops to player
-            for i in drop_map_section:
-                distance = (((player.x - i.x) ** 2) + ((player.y - i.y) ** 2)) ** 0.5
-                if abs(distance) < 190:
-                    if player.x - Cube_Size - i.x < 0:
-                        i.x -= 4
-                    elif player.x - Cube_Size - i.x > 0:
-                        i.x += 4
+            if not game_paused:
+                # Move drops to player
+                for i in drop_map_section:
+                    distance = (((player.x - i.x) ** 2) + ((player.y - i.y) ** 2)) ** 0.5
+                    if abs(distance) < 190:
+                        if player.x - Cube_Size - i.x < 0:
+                            i.x -= 4
+                        elif player.x - Cube_Size - i.x > 0:
+                            i.x += 4
 
-                    if player.y - Cube_Size - i.y < 0:
-                        i.y -= 4
-                    elif player.y - Cube_Size - i.y > 0:
-                        i.y += 4
+                        if player.y - Cube_Size - i.y < 0:
+                            i.y -= 4
+                        elif player.y - Cube_Size - i.y > 0:
+                            i.y += 4
 
-                    if i.x - 35 < player.x - Cube_Size < i.x + 35 and i.y - 35 < player.y - Cube_Size < i.y + 35:
-                        player.add_to_inventory((i.id, i.quantity))
-                        try:
-                            drop_map.remove(i)
-                            drop_map_section.remove(i)
-                        except:
-                            print("problem")
-                        pass
-            #print(player.inventory)
+                        if i.x - 35 < player.x - Cube_Size < i.x + 35 and i.y - 35 < player.y - Cube_Size < i.y + 35:
+                            player.add_to_inventory((i.id, i.quantity))
+                            try:
+                                drop_map.remove(i)
+                                drop_map_section.remove(i)
+                            except:
+                                print("problem")
+                            pass
+                #print(player.inventory)
 
             time.sleep(0.01)
 
@@ -1019,16 +1033,17 @@ def play(game_save):
         global night_value
         global game_days
         while game_running:
-            if timer >= 1440:
-                game_days += 1
-                timer = 0
-            elif 1320 < timer < 1380:
-                if night_value <= 120:
-                    night_value += 2
-            elif 360 < timer < 420:
-                night_value -= 2
+            if not game_paused:
+                if timer >= 1440:
+                    game_days += 1
+                    timer = 0
+                elif 1320 < timer < 1380:
+                    if night_value <= 120:
+                        night_value += 2
+                elif 360 < timer < 420:
+                    night_value -= 2
 
-            timer += 1
+                timer += 1
             time.sleep(0.01)#time.sleep(1)
 
 
@@ -1037,36 +1052,37 @@ def play(game_save):
         time.time() - previous_run_time
 
         while game_running:
-            delay = time.time() - previous_run_time
-            adjust_delay = player.speed * (delay - (Game_Tick / 15)) / (Game_Tick / 15)
-            previous_run_time = time.time()
+            if not game_paused:
+                delay = time.time() - previous_run_time
+                adjust_delay = player.speed * (delay - (Game_Tick / 15)) / (Game_Tick / 15)
+                previous_run_time = time.time()
 
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_a] and keys[pygame.K_w]:
-                if not collision_checker(player.x - int(player.speed * 90 / 100) - adjust_delay, player.y - int(player.speed * 90 / 100) - adjust_delay):
-                    collision_checker(player.x - int(player.speed * 90 / 100) - adjust_delay, player.y)
-                    collision_checker(player.x, player.y - int(player.speed * 90 / 100) - adjust_delay)
-            elif keys[pygame.K_a] and keys[pygame.K_s]:
-                if not collision_checker(player.x - int(player.speed * 90 / 100) - adjust_delay, player.y + int(player.speed * 90 / 100) + adjust_delay):
-                    collision_checker(player.x - int(player.speed * 90 / 100) - adjust_delay, player.y)
-                    collision_checker(player.x, player.y + int(player.speed * 90 / 100) + adjust_delay)
-            elif keys[pygame.K_d] and keys[pygame.K_w]:
-                if not collision_checker(player.x + int(player.speed * 90 / 100) + adjust_delay, player.y - int(player.speed * 90 / 100) - adjust_delay):
-                    collision_checker(player.x + int(player.speed * 90 / 100) + adjust_delay, player.y)
-                    collision_checker(player.x, player.y - int(player.speed * 90 / 100) - adjust_delay)
-            elif keys[pygame.K_d] and keys[pygame.K_s]:
-                if not collision_checker(player.x + int(player.speed * 90 / 100) + adjust_delay, player.y + int(player.speed * 90 / 100) + adjust_delay):
-                    collision_checker(player.x + int(player.speed * 90 / 100) + adjust_delay, player.y)
-                    collision_checker(player.x, player.y + int(player.speed * 90 / 100) + adjust_delay)
+                keys = pygame.key.get_pressed()
+                if keys[pygame.K_a] and keys[pygame.K_w]:
+                    if not collision_checker(player.x - int(player.speed * 90 / 100) - adjust_delay, player.y - int(player.speed * 90 / 100) - adjust_delay):
+                        collision_checker(player.x - int(player.speed * 90 / 100) - adjust_delay, player.y)
+                        collision_checker(player.x, player.y - int(player.speed * 90 / 100) - adjust_delay)
+                elif keys[pygame.K_a] and keys[pygame.K_s]:
+                    if not collision_checker(player.x - int(player.speed * 90 / 100) - adjust_delay, player.y + int(player.speed * 90 / 100) + adjust_delay):
+                        collision_checker(player.x - int(player.speed * 90 / 100) - adjust_delay, player.y)
+                        collision_checker(player.x, player.y + int(player.speed * 90 / 100) + adjust_delay)
+                elif keys[pygame.K_d] and keys[pygame.K_w]:
+                    if not collision_checker(player.x + int(player.speed * 90 / 100) + adjust_delay, player.y - int(player.speed * 90 / 100) - adjust_delay):
+                        collision_checker(player.x + int(player.speed * 90 / 100) + adjust_delay, player.y)
+                        collision_checker(player.x, player.y - int(player.speed * 90 / 100) - adjust_delay)
+                elif keys[pygame.K_d] and keys[pygame.K_s]:
+                    if not collision_checker(player.x + int(player.speed * 90 / 100) + adjust_delay, player.y + int(player.speed * 90 / 100) + adjust_delay):
+                        collision_checker(player.x + int(player.speed * 90 / 100) + adjust_delay, player.y)
+                        collision_checker(player.x, player.y + int(player.speed * 90 / 100) + adjust_delay)
 
-            elif keys[pygame.K_a]:
-                collision_checker(player.x - player.speed - adjust_delay, player.y)
-            elif keys[pygame.K_d]:
-                collision_checker(player.x + player.speed + adjust_delay, player.y)
-            elif keys[pygame.K_w]:
-                collision_checker(player.x, player.y - player.speed - adjust_delay)
-            elif keys[pygame.K_s]:
-                collision_checker(player.x, player.y + player.speed + adjust_delay)
+                elif keys[pygame.K_a]:
+                    collision_checker(player.x - player.speed - adjust_delay, player.y)
+                elif keys[pygame.K_d]:
+                    collision_checker(player.x + player.speed + adjust_delay, player.y)
+                elif keys[pygame.K_w]:
+                    collision_checker(player.x, player.y - player.speed - adjust_delay)
+                elif keys[pygame.K_s]:
+                    collision_checker(player.x, player.y + player.speed + adjust_delay)
 
             time.sleep(Game_Tick/15)
             #print(pygame.time.get_ticks() - start_time)
@@ -1075,54 +1091,86 @@ def play(game_save):
     def mouse_movement_handler():
         global mouse_position
         while game_running:
-            mouse_x, mouse_y = pygame.mouse.get_pos()
-            block_x = int((mouse_x * (1 / 30)) + (scroll[0] * (1 / 30)))
-            block_y = int((mouse_y * (1 / 30)) + (scroll[1] * (1 / 30)))
-            mouse_position = (block_x, block_y)
+            if not game_paused:
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                block_x = int((mouse_x * (1 / 30)) + (scroll[0] * (1 / 30)))
+                block_y = int((mouse_y * (1 / 30)) + (scroll[1] * (1 / 30)))
+                mouse_position = (block_x, block_y)
 
             time.sleep(0.01)
 
 
     def mouse_clicker_handler():
         while game_running:
-            mouse_x, mouse_y = mouse_position
-            left, middle, right = pygame.mouse.get_pressed()
-            if left:
-                entity = world[mouse_x][mouse_y].entity
-                if entity.health <= 0:
-                    entities_to_remove.append((mouse_x, mouse_y))
-                else:
-                    entity.damage(10)
+            if not game_paused:
+                mouse_x, mouse_y = mouse_position
+                left, middle, right = pygame.mouse.get_pressed()
+                if left:
+                    entity = world[mouse_x][mouse_y].entity
+                    if entity.health <= 0:
+                        entities_to_remove.append((mouse_x, mouse_y))
+                    else:
+                        entity.damage(10)
 
-                time.sleep(0.1)
+                    time.sleep(0.1)
 
             time.sleep(0.01)
 
+    def idle_annimations_handler():
+        idx = 0
+        while game_running:
+            if not game_paused:
+                for i in idle_animation_list:
+                    if i.last_move < time.time():
+                        if idx >= len(i.images_idle) - 1:
+                            idx = 0
+                        else:
+                            i.image = i.images_idle[idx]
+                            idx += 1
+
+            time.sleep(0.08)
+
+
+
+
+    idle_annimations = threading.Thread(target=idle_annimations_handler)
+    idle_annimations.daemon = True
+    idle_annimations.start()
+
     entities_update = threading.Thread(target=entities_update_handler)
+    entities_update.daemon = True
     entities_update.start()
 
     player_movement = threading.Thread(target=player_movement_handler)
+    player_movement.daemon = True
     player_movement.start()
 
     mouse_movement = threading.Thread(target=mouse_movement_handler)
+    mouse_movement.daemon = True
     mouse_movement.start()
 
     mouse_clicker = threading.Thread(target=mouse_clicker_handler)
+    mouse_clicker.daemon = True
     mouse_clicker.start()
 
     update_visible_world = threading.Thread(target=update_world_section)
+    update_visible_world.daemon = True
     update_visible_world.start()
 
     drop_timeout = threading.Thread(target=drop_timeout_remover)
+    drop_timeout.daemon = True
     drop_timeout.start()
 
     drop_man = threading.Thread(target=drop_manager)
+    drop_man.daemon = True
     drop_man.start()
 
     drop_col_man = threading.Thread(target=drop_collection_manager)
+    drop_col_man.daemon = True
     drop_col_man.start()
 
     time_handler = threading.Thread(target=time_handler)
+    time_handler.daemon = True
     time_handler.start()
 
 
@@ -1163,6 +1211,7 @@ def play(game_save):
                         screen = pygame.display.set_mode(size, pygame.SCALED)
                     #screen = pygame.display.set_mode(size, pygame.SCALED | pygame.FULLSCREEN)
                 if e.key == pygame.K_ESCAPE:
+                    world_loader.save(world, player, drop_map)
                     esc_menu()
 
             if e.type == pygame.QUIT:
@@ -1172,6 +1221,8 @@ def play(game_save):
                 playing = False
                 game_running = False
                 pygame.quit()
+                exit()
+                break
 
         #screen.fill('white')
 

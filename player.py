@@ -22,10 +22,11 @@ class Player():
         self.inventory = []
         self.inventory_full = False
         self.looking_direction = False
+        self.last_move = time.time()
 
 
-        player_movement = threading.Thread(target=self.idle)
-        player_movement.start()
+        #player_movement = threading.Thread(target=self.idle)
+        #player_movement.start()
 
 
 
@@ -99,6 +100,7 @@ class Player():
         self.x = x
         self.y = y
         self.update_sprite()
+        self.last_move = time.time()
 
     def update_sprite(self):
         if self.index >= len(self.images_right) - 1:

@@ -129,7 +129,7 @@ class Worldloader:
                     elif world[x][y].id == 3:
                         data[x, y] = [3, 190, 252]
                     elif world[x][y].id == 4:
-                        data[x, y] = [0, 0, 0]
+                        data[x, y] = [255, 255, 255]
 
             Image.fromarray(data).save(filename)
 
