@@ -14,11 +14,15 @@ GAME_NAME = "GuiGame"
 class Worldloader:
     def __init__(self):
         self.world_in_use = 0
+        self.worlds_quick_load = [False, False, False, False, False, False, False, False]
         self.worlds = [None, None, None, None, None, None, None, None]
         self.worlds_minimaps = [None, None, None, None, None, None, None, None]
         self.load()
         #side_load = threading.Thread(target=self.load)
         #side_load.start()
+
+    def get_game_name(self):
+        return GAME_NAME
 
     def load(self):
         start_time = time.time()
@@ -101,6 +105,38 @@ class Worldloader:
         except:
             pass
 
+        print("--- Loaded in: %s seconds ---" % (time.time() - start_time))
+
+    def quick_load(self):
+        start_time = time.time()
+        if os.path.isfile(os.getenv('APPDATA') + "\\" + GAME_NAME + "\world0.save"):
+            self.worlds_quick_load[0] = True
+        if os.path.isfile(os.getenv('APPDATA') + "\\" + GAME_NAME + "\world1.save"):
+            self.worlds_quick_load[1] = True
+        if os.path.isfile(os.getenv('APPDATA') + "\\" + GAME_NAME + "\world2.save"):
+            self.worlds_quick_load[2] = True
+        if os.path.isfile(os.getenv('APPDATA') + "\\" + GAME_NAME + "\world3.save"):
+            self.worlds_quick_load[3] = True
+        if os.path.isfile(os.getenv('APPDATA') + "\\" + GAME_NAME + "\world4.save"):
+            self.worlds_quick_load[4] = True
+        if os.path.isfile(os.getenv('APPDATA') + "\\" + GAME_NAME + "\world5.save"):
+            self.worlds_quick_load[5] = True
+        if os.path.isfile(os.getenv('APPDATA') + "\\" + GAME_NAME + "\world6.save"):
+            self.worlds_quick_load[6] = True
+        if os.path.isfile(os.getenv('APPDATA') + "\\" + GAME_NAME + "\world7.save"):
+            self.worlds_quick_load[7] = True
+        print("--- Quick Loaded in: %s seconds ---" % (time.time() - start_time))
+
+    def load_world(self, number):
+        try:
+            filename = os.getenv('APPDATA') + "\\" + GAME_NAME + "\world" + number + ".save"
+            with open(filename, "rb") as f:
+                gc.disable()
+                self.worlds[number] = pickle.load(f)
+                gc.enable()
+                self.worlds_minimaps[number] = self.map_to_img(self.worlds[1][0], 1)
+        except:
+            pass
         print("--- Loaded in: %s seconds ---" % (time.time() - start_time))
 
     def save(self, world, player, drop_map):

@@ -145,8 +145,13 @@ def main_menu():
 def save_selector_menu():
     bg = pygame.image.load('images/Menu/bg.jpg').convert()
     play_btn = [pygame.image.load('images/Menu/play1.png').convert_alpha(), pygame.image.load('images/Menu/play2.png').convert_alpha()]
+    under_map_board = pygame.image.load('images/Menu/world_selector_board.png').convert()
+    trash_can = [pygame.image.load('images/Menu/trash.png').convert_alpha(), pygame.image.load('images/Menu/trash2.png').convert_alpha()]
 
     #world_loader.load()
+
+
+
 
     x = 0
     global screen
@@ -165,7 +170,9 @@ def save_selector_menu():
 
 
         FPS_FONT = pygame.font.SysFont("franklingothicmedium", 70)
+        last_played_font = pygame.font.SysFont("franklingothicmedium", 15)
         color = pygame.Color("black")
+        rectangle_color = pygame.Color("brown")
 
         rel_x = x % bg.get_rect().width
         screen.blit(bg, (rel_x - bg.get_rect().width, 0))
@@ -287,11 +294,11 @@ def save_selector_menu():
             if click:
                 if world_loader.worlds[3] is None:
                     world_loader.world_in_use = 3
-                    play()
+                    play(None)
                 else:
                     #save_load(world_loader.worlds[3])
                     world_loader.world_in_use = 3
-                    play()
+                    play(world_loader.worlds[3])
 
         if btn_save5.collidepoint((mx, my)):
             btn_save1_inflated = pygame.Rect(btn_save5.x - 1, btn_save5.y - 1, btn_save5.width + 2, btn_save5.height + 2)
@@ -301,11 +308,11 @@ def save_selector_menu():
             if click:
                 if world_loader.worlds[4] is None:
                     world_loader.world_in_use = 4
-                    play()
+                    play(None)
                 else:
                     #save_load(world_loader.worlds[4])
                     world_loader.world_in_use = 4
-                    play()
+                    play(world_loader.worlds[4])
 
         if btn_save6.collidepoint((mx, my)):
             btn_save1_inflated = pygame.Rect(btn_save6.x - 1, btn_save6.y - 1, btn_save6.width + 2, btn_save6.height + 2)
@@ -315,11 +322,11 @@ def save_selector_menu():
             if click:
                 if world_loader.worlds[5] is None:
                     world_loader.world_in_use = 5
-                    play()
+                    play(None)
                 else:
                     #save_load(world_loader.worlds[5])
                     world_loader.world_in_use = 5
-                    play()
+                    play(world_loader.worlds[5])
 
         if btn_save7.collidepoint((mx, my)):
             btn_save1_inflated = pygame.Rect(btn_save7.x - 1, btn_save7.y - 1, btn_save7.width + 2, btn_save7.height + 2)
@@ -329,11 +336,11 @@ def save_selector_menu():
             if click:
                 if world_loader.worlds[6] is None:
                     world_loader.world_in_use = 6
-                    play()
+                    play(None)
                 else:
                     #save_load(world_loader.worlds[6])
                     world_loader.world_in_use = 6
-                    play()
+                    play(world_loader.worlds[6])
 
         if btn_save8.collidepoint((mx, my)):
             btn_save1_inflated = pygame.Rect(btn_save8.x - 1, btn_save8.y - 1, btn_save8.width + 2, btn_save8.height + 2)
@@ -343,11 +350,11 @@ def save_selector_menu():
             if click:
                 if world_loader.worlds[7] is None:
                     world_loader.world_in_use = 7
-                    play()
+                    play(None)
                 else:
                     #save_load(world_loader.worlds[7])
                     world_loader.world_in_use = 7
-                    play()
+                    play(world_loader.worlds[7])
 
         if world_loader.worlds[0] is None:
             text_rect = text_plus.get_rect(center=btn_save1.center)
@@ -356,12 +363,47 @@ def save_selector_menu():
             text_rect = play_btn[0].get_rect(center=btn_save1.center)
             screen.blit(play_btn[0], text_rect)
 
+            file_last_modified_time = os.path.getmtime(os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\world0.save")
+            formatted_time = time.strftime('%Y-%m-%d  %H:%M', time.localtime(file_last_modified_time))
+            last_time_played_text = last_played_font.render("Last time played:", True, color)
+            last_time_played_time = last_played_font.render(formatted_time, True, color)
+            btn_trash = pygame.Rect(text_rect.x + 75, text_rect.y + 123, 32, 32)
+            screen.blit(under_map_board, (text_rect.x - 85, text_rect.y + 115))
+            screen.blit(trash_can[0], btn_trash)
+            if btn_trash.collidepoint((mx, my)):
+                screen.blit(trash_can[1], btn_trash)
+                if click:
+                    os.remove(os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\world0.save")
+                    os.remove(os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\minimap0.png")
+                    world_loader.worlds[0] = None
+                    world_loader.worlds_minimaps[0] = None
+            screen.blit(last_time_played_text, (text_rect.x - 75, text_rect.y + 120))
+            screen.blit(last_time_played_time, (text_rect.x - 75, text_rect.y + 140))
+
         if world_loader.worlds[1] is None:
             text_rect = text_plus.get_rect(center=btn_save2.center)
             screen.blit(text_plus, text_rect)
         else:
             text_rect = play_btn[0].get_rect(center=btn_save2.center)
             screen.blit(play_btn[0], text_rect)
+
+            file_last_modified_time = os.path.getmtime(
+                os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\world1.save")
+            formatted_time = time.strftime('%Y-%m-%d  %H:%M', time.localtime(file_last_modified_time))
+            last_time_played_text = last_played_font.render("Last time played:", True, color)
+            last_time_played_time = last_played_font.render(formatted_time, True, color)
+            btn_trash1 = pygame.Rect(text_rect.x + 75, text_rect.y + 123, 32, 32)
+            screen.blit(under_map_board, (text_rect.x - 85, text_rect.y + 115))
+            screen.blit(trash_can[0], btn_trash1)
+            if btn_trash1.collidepoint((mx, my)):
+                screen.blit(trash_can[1], btn_trash1)
+                if click:
+                    os.remove(os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\world1.save")
+                    os.remove(os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\minimap1.png")
+                    world_loader.worlds[0] = None
+                    world_loader.worlds_minimaps[0] = None
+            screen.blit(last_time_played_text, (text_rect.x - 75, text_rect.y + 120))
+            screen.blit(last_time_played_time, (text_rect.x - 75, text_rect.y + 140))
 
         if world_loader.worlds[2] is None:
             text_rect = text_plus.get_rect(center=btn_save3.center)
@@ -370,12 +412,48 @@ def save_selector_menu():
             text_rect = play_btn[0].get_rect(center=btn_save3.center)
             screen.blit(play_btn[0], text_rect)
 
+            file_last_modified_time = os.path.getmtime(
+                os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\world2.save")
+            formatted_time = time.strftime('%Y-%m-%d  %H:%M', time.localtime(file_last_modified_time))
+            last_time_played_text = last_played_font.render("Last time played:", True, color)
+            last_time_played_time = last_played_font.render(formatted_time, True, color)
+            btn_trash2 = pygame.Rect(text_rect.x + 75, text_rect.y + 123, 32, 32)
+            screen.blit(under_map_board, (text_rect.x - 85, text_rect.y + 115))
+            screen.blit(trash_can[0], btn_trash2)
+            if btn_trash2.collidepoint((mx, my)):
+                screen.blit(trash_can[1], btn_trash2)
+                if click:
+                    os.remove(os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\world2.save")
+                    os.remove(os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\minimap2.png")
+                    world_loader.worlds[0] = None
+                    world_loader.worlds_minimaps[0] = None
+            screen.blit(last_time_played_text, (text_rect.x - 75, text_rect.y + 120))
+            screen.blit(last_time_played_time, (text_rect.x - 75, text_rect.y + 140))
+
         if world_loader.worlds[3] is None:
             text_rect = text_plus.get_rect(center=btn_save4.center)
             screen.blit(text_plus, text_rect)
         else:
             text_rect = play_btn[0].get_rect(center=btn_save4.center)
             screen.blit(play_btn[0], text_rect)
+
+            file_last_modified_time = os.path.getmtime(
+                os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\world3.save")
+            formatted_time = time.strftime('%Y-%m-%d  %H:%M', time.localtime(file_last_modified_time))
+            last_time_played_text = last_played_font.render("Last time played:", True, color)
+            last_time_played_time = last_played_font.render(formatted_time, True, color)
+            btn_trash3 = pygame.Rect(text_rect.x + 75, text_rect.y + 123, 32, 32)
+            screen.blit(under_map_board, (text_rect.x - 85, text_rect.y + 115))
+            screen.blit(trash_can[0], btn_trash3)
+            if btn_trash3.collidepoint((mx, my)):
+                screen.blit(trash_can[1], btn_trash3)
+                if click:
+                    os.remove(os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\world3.save")
+                    os.remove(os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\minimap3.png")
+                    world_loader.worlds[0] = None
+                    world_loader.worlds_minimaps[0] = None
+            screen.blit(last_time_played_text, (text_rect.x - 75, text_rect.y + 120))
+            screen.blit(last_time_played_time, (text_rect.x - 75, text_rect.y + 140))
 
         if world_loader.worlds[4] is None:
             text_rect = text_plus.get_rect(center=btn_save5.center)
@@ -384,12 +462,48 @@ def save_selector_menu():
             text_rect = play_btn[0].get_rect(center=btn_save5.center)
             screen.blit(play_btn[0], text_rect)
 
+            file_last_modified_time = os.path.getmtime(
+                os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\world4.save")
+            formatted_time = time.strftime('%Y-%m-%d  %H:%M', time.localtime(file_last_modified_time))
+            last_time_played_text = last_played_font.render("Last time played:", True, color)
+            last_time_played_time = last_played_font.render(formatted_time, True, color)
+            btn_trash4 = pygame.Rect(text_rect.x + 75, text_rect.y + 123, 32, 32)
+            screen.blit(under_map_board, (text_rect.x - 85, text_rect.y + 115))
+            screen.blit(trash_can[0], btn_trash4)
+            if btn_trash4.collidepoint((mx, my)):
+                screen.blit(trash_can[1], btn_trash4)
+                if click:
+                    os.remove(os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\world4.save")
+                    os.remove(os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\minimap4.png")
+                    world_loader.worlds[0] = None
+                    world_loader.worlds_minimaps[0] = None
+            screen.blit(last_time_played_text, (text_rect.x - 75, text_rect.y + 120))
+            screen.blit(last_time_played_time, (text_rect.x - 75, text_rect.y + 140))
+
         if world_loader.worlds[5] is None:
             text_rect = text_plus.get_rect(center=btn_save6.center)
             screen.blit(text_plus, text_rect)
         else:
             text_rect = play_btn[0].get_rect(center=btn_save6.center)
             screen.blit(play_btn[0], text_rect)
+
+            file_last_modified_time = os.path.getmtime(
+                os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\world5.save")
+            formatted_time = time.strftime('%Y-%m-%d  %H:%M', time.localtime(file_last_modified_time))
+            last_time_played_text = last_played_font.render("Last time played:", True, color)
+            last_time_played_time = last_played_font.render(formatted_time, True, color)
+            btn_trash5 = pygame.Rect(text_rect.x + 75, text_rect.y + 123, 32, 32)
+            screen.blit(under_map_board, (text_rect.x - 85, text_rect.y + 115))
+            screen.blit(trash_can[0], btn_trash5)
+            if btn_trash5.collidepoint((mx, my)):
+                screen.blit(trash_can[1], btn_trash5)
+                if click:
+                    os.remove(os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\world5.save")
+                    os.remove(os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\minimap5.png")
+                    world_loader.worlds[0] = None
+                    world_loader.worlds_minimaps[0] = None
+            screen.blit(last_time_played_text, (text_rect.x - 75, text_rect.y + 120))
+            screen.blit(last_time_played_time, (text_rect.x - 75, text_rect.y + 140))
 
         if world_loader.worlds[6] is None:
             text_rect = text_plus.get_rect(center=btn_save7.center)
@@ -398,12 +512,48 @@ def save_selector_menu():
             text_rect = play_btn[0].get_rect(center=btn_save7.center)
             screen.blit(play_btn[0], text_rect)
 
+            file_last_modified_time = os.path.getmtime(
+                os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\world6.save")
+            formatted_time = time.strftime('%Y-%m-%d  %H:%M', time.localtime(file_last_modified_time))
+            last_time_played_text = last_played_font.render("Last time played:", True, color)
+            last_time_played_time = last_played_font.render(formatted_time, True, color)
+            btn_trash6 = pygame.Rect(text_rect.x + 75, text_rect.y + 123, 32, 32)
+            screen.blit(under_map_board, (text_rect.x - 85, text_rect.y + 115))
+            screen.blit(trash_can[0], btn_trash6)
+            if btn_trash6.collidepoint((mx, my)):
+                screen.blit(trash_can[1], btn_trash6)
+                if click:
+                    os.remove(os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\world6.save")
+                    os.remove(os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\minimap6.png")
+                    world_loader.worlds[0] = None
+                    world_loader.worlds_minimaps[0] = None
+            screen.blit(last_time_played_text, (text_rect.x - 75, text_rect.y + 120))
+            screen.blit(last_time_played_time, (text_rect.x - 75, text_rect.y + 140))
+
         if world_loader.worlds[7] is None:
             text_rect = text_plus.get_rect(center=btn_save8.center)
             screen.blit(text_plus, text_rect)
         else:
             text_rect = play_btn[0].get_rect(center=btn_save8.center)
             screen.blit(play_btn[0], text_rect)
+
+            file_last_modified_time = os.path.getmtime(
+                os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\world7.save")
+            formatted_time = time.strftime('%Y-%m-%d  %H:%M', time.localtime(file_last_modified_time))
+            last_time_played_text = last_played_font.render("Last time played:", True, color)
+            last_time_played_time = last_played_font.render(formatted_time, True, color)
+            btn_trash7 = pygame.Rect(text_rect.x + 75, text_rect.y + 123, 32, 32)
+            screen.blit(under_map_board, (text_rect.x - 85, text_rect.y + 115))
+            screen.blit(trash_can[0], btn_trash7)
+            if btn_trash7.collidepoint((mx, my)):
+                screen.blit(trash_can[1], btn_trash7)
+                if click:
+                    os.remove(os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\world7.save")
+                    os.remove(os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\minimap7.png")
+                    world_loader.worlds[0] = None
+                    world_loader.worlds_minimaps[0] = None
+            screen.blit(last_time_played_text, (text_rect.x - 75, text_rect.y + 120))
+            screen.blit(last_time_played_time, (text_rect.x - 75, text_rect.y + 140))
 
         pygame.draw.rect(screen, (0, 0, 0), btn_save1, 2)
         pygame.draw.rect(screen, (0, 0, 0), btn_save2, 2)
