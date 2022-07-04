@@ -147,10 +147,12 @@ def save_selector_menu():
     play_btn = [pygame.image.load('images/Menu/play1.png').convert_alpha(), pygame.image.load('images/Menu/play2.png').convert_alpha()]
     under_map_board = pygame.image.load('images/Menu/world_selector_board.png').convert()
     trash_can = [pygame.image.load('images/Menu/trash.png').convert_alpha(), pygame.image.load('images/Menu/trash2.png').convert_alpha()]
+    loading_screen = pygame.image.load('images/Menu/loading.jpg').convert()
 
     #world_loader.load()
 
 
+    print("worlds", world_loader.worlds_quick_load)
 
 
     x = 0
@@ -246,124 +248,129 @@ def save_selector_menu():
         if btn_save1.collidepoint((mx, my)):
             btn_save1_inflated = pygame.Rect(btn_save1.x - 1, btn_save1.y - 1, btn_save1.width + 2, btn_save1.height + 2)
             pygame.draw.rect(screen, (255, 255, 255), btn_save1_inflated, 2)
-            if world_loader.worlds[0] is not None:
+            if world_loader.worlds_quick_load[0]:
                 screen.blit(play_btn[1], play_btn[1].get_rect(center=btn_save1.center))
             if click:
-                if world_loader.worlds[0] is None:
-                    world_loader.world_in_use = 0
-                    play(None)
+                world_loader.world_in_use = 0
+                screen.blit(loading_screen, (0, 0))
+                pygame.display.flip()
+                if world_loader.worlds_quick_load[0]:
+                    play(world_loader.load_world(0))
                 else:
-                    #save_load(world_loader.worlds[0])
-                    world_loader.world_in_use = 0
-                    play(world_loader.worlds[0])
-                    break
+                    play(None)
+
 
         if btn_save2.collidepoint((mx, my)):
             btn_save1_inflated = pygame.Rect(btn_save2.x - 1, btn_save2.y - 1, btn_save2.width + 2, btn_save2.height + 2)
             pygame.draw.rect(screen, (255, 255, 255), btn_save1_inflated, 2)
-            if world_loader.worlds[1] is not None:
+            if world_loader.worlds_quick_load[1]:
                 screen.blit(play_btn[1], play_btn[1].get_rect(center=btn_save2.center))
             if click:
-                if world_loader.worlds[1] is None:
-                    world_loader.world_in_use = 1
-                    play(None)
+                world_loader.world_in_use = 1
+                screen.blit(loading_screen, (0, 0))
+                pygame.display.flip()
+                if world_loader.worlds_quick_load[1]:
+                    play(world_loader.load_world(1))
                 else:
-                    #save_load(world_loader.worlds[1])
-                    world_loader.world_in_use = 1
-                    play(world_loader.worlds[1])
+                    play(None)
+
 
         if btn_save3.collidepoint((mx, my)):
             btn_save1_inflated = pygame.Rect(btn_save3.x - 1, btn_save3.y - 1, btn_save3.width + 2, btn_save3.height + 2)
             pygame.draw.rect(screen, (255, 255, 255), btn_save1_inflated, 2)
-            if world_loader.worlds[2] is not None:
+            if world_loader.worlds_quick_load[2]:
                 screen.blit(play_btn[1], play_btn[1].get_rect(center=btn_save3.center))
             if click:
-                if world_loader.worlds[2] is None:
-                    world_loader.world_in_use = 2
-                    play(None)
+                world_loader.world_in_use = 2
+                screen.blit(loading_screen, (0, 0))
+                pygame.display.flip()
+                if world_loader.worlds_quick_load[2]:
+                    play(world_loader.load_world(2))
                 else:
-                    #save_load(world_loader.worlds[2])
-                    world_loader.world_in_use = 2
-                    play(world_loader.worlds[2])
+                    play(None)
+
 
         if btn_save4.collidepoint((mx, my)):
             btn_save1_inflated = pygame.Rect(btn_save4.x - 1, btn_save4.y - 1, btn_save4.width + 2, btn_save4.height + 2)
             pygame.draw.rect(screen, (255, 255, 255), btn_save1_inflated, 2)
-            if world_loader.worlds[3] is not None:
+            if world_loader.worlds_quick_load[3]:
                 screen.blit(play_btn[1], play_btn[1].get_rect(center=btn_save4.center))
             if click:
-                if world_loader.worlds[3] is None:
-                    world_loader.world_in_use = 3
-                    play(None)
+                world_loader.world_in_use = 3
+                screen.blit(loading_screen, (0, 0))
+                pygame.display.flip()
+                if world_loader.worlds_quick_load[3]:
+                    play(world_loader.load_world(3))
                 else:
-                    #save_load(world_loader.worlds[3])
-                    world_loader.world_in_use = 3
-                    play(world_loader.worlds[3])
+                    play(None)
+
 
         if btn_save5.collidepoint((mx, my)):
             btn_save1_inflated = pygame.Rect(btn_save5.x - 1, btn_save5.y - 1, btn_save5.width + 2, btn_save5.height + 2)
             pygame.draw.rect(screen, (255, 255, 255), btn_save1_inflated, 2)
-            if world_loader.worlds[4] is not None:
+            if world_loader.worlds_quick_load[4]:
                 screen.blit(play_btn[1], play_btn[1].get_rect(center=btn_save5.center))
             if click:
-                if world_loader.worlds[4] is None:
-                    world_loader.world_in_use = 4
-                    play(None)
+                world_loader.world_in_use = 4
+                screen.blit(loading_screen, (0, 0))
+                pygame.display.flip()
+                if world_loader.worlds_quick_load[4]:
+                    play(world_loader.load_world(4))
                 else:
-                    #save_load(world_loader.worlds[4])
-                    world_loader.world_in_use = 4
-                    play(world_loader.worlds[4])
+                    play(None)
+
 
         if btn_save6.collidepoint((mx, my)):
             btn_save1_inflated = pygame.Rect(btn_save6.x - 1, btn_save6.y - 1, btn_save6.width + 2, btn_save6.height + 2)
             pygame.draw.rect(screen, (255, 255, 255), btn_save1_inflated, 2)
-            if world_loader.worlds[5] is not None:
+            if world_loader.worlds_quick_load[5]:
                 screen.blit(play_btn[1], play_btn[1].get_rect(center=btn_save6.center))
             if click:
-                if world_loader.worlds[5] is None:
-                    world_loader.world_in_use = 5
-                    play(None)
+                world_loader.world_in_use = 5
+                screen.blit(loading_screen, (0, 0))
+                pygame.display.flip()
+                if world_loader.worlds_quick_load[5]:
+                    play(world_loader.load_world(5))
                 else:
-                    #save_load(world_loader.worlds[5])
-                    world_loader.world_in_use = 5
-                    play(world_loader.worlds[5])
+                    play(None)
+
 
         if btn_save7.collidepoint((mx, my)):
             btn_save1_inflated = pygame.Rect(btn_save7.x - 1, btn_save7.y - 1, btn_save7.width + 2, btn_save7.height + 2)
             pygame.draw.rect(screen, (255, 255, 255), btn_save1_inflated, 2)
-            if world_loader.worlds[6] is not None:
+            if world_loader.worlds_quick_load[6]:
                 screen.blit(play_btn[1], play_btn[1].get_rect(center=btn_save7.center))
             if click:
-                if world_loader.worlds[6] is None:
-                    world_loader.world_in_use = 6
-                    play(None)
+                world_loader.world_in_use = 6
+                screen.blit(loading_screen, (0, 0))
+                pygame.display.flip()
+                if world_loader.worlds_quick_load[6]:
+                    play(world_loader.load_world(6))
                 else:
-                    #save_load(world_loader.worlds[6])
-                    world_loader.world_in_use = 6
-                    play(world_loader.worlds[6])
+                    play(None)
+
 
         if btn_save8.collidepoint((mx, my)):
             btn_save1_inflated = pygame.Rect(btn_save8.x - 1, btn_save8.y - 1, btn_save8.width + 2, btn_save8.height + 2)
             pygame.draw.rect(screen, (255, 255, 255), btn_save1_inflated, 2)
-            if world_loader.worlds[7] is not None:
+            if world_loader.worlds_quick_load[7]:
                 screen.blit(play_btn[1], play_btn[1].get_rect(center=btn_save8.center))
             if click:
-                if world_loader.worlds[7] is None:
-                    world_loader.world_in_use = 7
-                    play(None)
+                world_loader.world_in_use = 7
+                screen.blit(loading_screen, (0, 0))
+                pygame.display.flip()
+                if world_loader.worlds_quick_load[7]:
+                    play(world_loader.load_world(7))
                 else:
-                    #save_load(world_loader.worlds[7])
-                    world_loader.world_in_use = 7
-                    play(world_loader.worlds[7])
+                    play(None)
 
-        if world_loader.worlds[0] is None:
-            text_rect = text_plus.get_rect(center=btn_save1.center)
-            screen.blit(text_plus, text_rect)
-        else:
+
+        if world_loader.worlds_quick_load[0]:
             text_rect = play_btn[0].get_rect(center=btn_save1.center)
             screen.blit(play_btn[0], text_rect)
 
-            file_last_modified_time = os.path.getmtime(os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\world0.save")
+            file_last_modified_time = os.path.getmtime(
+                os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\world0.save")
             formatted_time = time.strftime('%Y-%m-%d  %H:%M', time.localtime(file_last_modified_time))
             last_time_played_text = last_played_font.render("Last time played:", True, color)
             last_time_played_time = last_played_font.render(formatted_time, True, color)
@@ -375,15 +382,16 @@ def save_selector_menu():
                 if click:
                     os.remove(os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\world0.save")
                     os.remove(os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\minimap0.png")
-                    world_loader.worlds[0] = None
+                    world_loader.worlds_quick_load[0] = False
                     world_loader.worlds_minimaps[0] = None
             screen.blit(last_time_played_text, (text_rect.x - 75, text_rect.y + 120))
             screen.blit(last_time_played_time, (text_rect.x - 75, text_rect.y + 140))
-
-        if world_loader.worlds[1] is None:
-            text_rect = text_plus.get_rect(center=btn_save2.center)
-            screen.blit(text_plus, text_rect)
         else:
+            text_rect = text_plus.get_rect(center=btn_save1.center)
+            screen.blit(text_plus, text_rect)
+
+
+        if world_loader.worlds_quick_load[1]:
             text_rect = play_btn[0].get_rect(center=btn_save2.center)
             screen.blit(play_btn[0], text_rect)
 
@@ -400,15 +408,16 @@ def save_selector_menu():
                 if click:
                     os.remove(os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\world1.save")
                     os.remove(os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\minimap1.png")
-                    world_loader.worlds[0] = None
-                    world_loader.worlds_minimaps[0] = None
+                    world_loader.worlds_quick_load[1] = False
+                    world_loader.worlds_minimaps[1] = None
             screen.blit(last_time_played_text, (text_rect.x - 75, text_rect.y + 120))
             screen.blit(last_time_played_time, (text_rect.x - 75, text_rect.y + 140))
-
-        if world_loader.worlds[2] is None:
-            text_rect = text_plus.get_rect(center=btn_save3.center)
-            screen.blit(text_plus, text_rect)
         else:
+            text_rect = text_plus.get_rect(center=btn_save2.center)
+            screen.blit(text_plus, text_rect)
+
+
+        if world_loader.worlds_quick_load[2]:
             text_rect = play_btn[0].get_rect(center=btn_save3.center)
             screen.blit(play_btn[0], text_rect)
 
@@ -425,15 +434,16 @@ def save_selector_menu():
                 if click:
                     os.remove(os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\world2.save")
                     os.remove(os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\minimap2.png")
-                    world_loader.worlds[0] = None
-                    world_loader.worlds_minimaps[0] = None
+                    world_loader.worlds_quick_load[2] = False
+                    world_loader.worlds_minimaps[2] = None
             screen.blit(last_time_played_text, (text_rect.x - 75, text_rect.y + 120))
             screen.blit(last_time_played_time, (text_rect.x - 75, text_rect.y + 140))
-
-        if world_loader.worlds[3] is None:
-            text_rect = text_plus.get_rect(center=btn_save4.center)
-            screen.blit(text_plus, text_rect)
         else:
+            text_rect = text_plus.get_rect(center=btn_save3.center)
+            screen.blit(text_plus, text_rect)
+
+
+        if world_loader.worlds_quick_load[3]:
             text_rect = play_btn[0].get_rect(center=btn_save4.center)
             screen.blit(play_btn[0], text_rect)
 
@@ -450,15 +460,16 @@ def save_selector_menu():
                 if click:
                     os.remove(os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\world3.save")
                     os.remove(os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\minimap3.png")
-                    world_loader.worlds[0] = None
-                    world_loader.worlds_minimaps[0] = None
+                    world_loader.worlds_quick_load[3] = False
+                    world_loader.worlds_minimaps[3] = None
             screen.blit(last_time_played_text, (text_rect.x - 75, text_rect.y + 120))
             screen.blit(last_time_played_time, (text_rect.x - 75, text_rect.y + 140))
-
-        if world_loader.worlds[4] is None:
-            text_rect = text_plus.get_rect(center=btn_save5.center)
-            screen.blit(text_plus, text_rect)
         else:
+            text_rect = text_plus.get_rect(center=btn_save4.center)
+            screen.blit(text_plus, text_rect)
+
+
+        if world_loader.worlds_quick_load[4]:
             text_rect = play_btn[0].get_rect(center=btn_save5.center)
             screen.blit(play_btn[0], text_rect)
 
@@ -475,15 +486,16 @@ def save_selector_menu():
                 if click:
                     os.remove(os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\world4.save")
                     os.remove(os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\minimap4.png")
-                    world_loader.worlds[0] = None
-                    world_loader.worlds_minimaps[0] = None
+                    world_loader.worlds_quick_load[4] = False
+                    world_loader.worlds_minimaps[4] = None
             screen.blit(last_time_played_text, (text_rect.x - 75, text_rect.y + 120))
             screen.blit(last_time_played_time, (text_rect.x - 75, text_rect.y + 140))
-
-        if world_loader.worlds[5] is None:
-            text_rect = text_plus.get_rect(center=btn_save6.center)
-            screen.blit(text_plus, text_rect)
         else:
+            text_rect = text_plus.get_rect(center=btn_save5.center)
+            screen.blit(text_plus, text_rect)
+
+
+        if world_loader.worlds_quick_load[5]:
             text_rect = play_btn[0].get_rect(center=btn_save6.center)
             screen.blit(play_btn[0], text_rect)
 
@@ -500,15 +512,16 @@ def save_selector_menu():
                 if click:
                     os.remove(os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\world5.save")
                     os.remove(os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\minimap5.png")
-                    world_loader.worlds[0] = None
-                    world_loader.worlds_minimaps[0] = None
+                    world_loader.worlds_quick_load[5] = False
+                    world_loader.worlds_minimaps[5] = None
             screen.blit(last_time_played_text, (text_rect.x - 75, text_rect.y + 120))
             screen.blit(last_time_played_time, (text_rect.x - 75, text_rect.y + 140))
-
-        if world_loader.worlds[6] is None:
-            text_rect = text_plus.get_rect(center=btn_save7.center)
-            screen.blit(text_plus, text_rect)
         else:
+            text_rect = text_plus.get_rect(center=btn_save6.center)
+            screen.blit(text_plus, text_rect)
+
+
+        if world_loader.worlds_quick_load[6]:
             text_rect = play_btn[0].get_rect(center=btn_save7.center)
             screen.blit(play_btn[0], text_rect)
 
@@ -525,15 +538,16 @@ def save_selector_menu():
                 if click:
                     os.remove(os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\world6.save")
                     os.remove(os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\minimap6.png")
-                    world_loader.worlds[0] = None
-                    world_loader.worlds_minimaps[0] = None
+                    world_loader.worlds_quick_load[6] = False
+                    world_loader.worlds_minimaps[6] = None
             screen.blit(last_time_played_text, (text_rect.x - 75, text_rect.y + 120))
             screen.blit(last_time_played_time, (text_rect.x - 75, text_rect.y + 140))
-
-        if world_loader.worlds[7] is None:
-            text_rect = text_plus.get_rect(center=btn_save8.center)
-            screen.blit(text_plus, text_rect)
         else:
+            text_rect = text_plus.get_rect(center=btn_save7.center)
+            screen.blit(text_plus, text_rect)
+
+
+        if world_loader.worlds_quick_load[7]:
             text_rect = play_btn[0].get_rect(center=btn_save8.center)
             screen.blit(play_btn[0], text_rect)
 
@@ -550,10 +564,14 @@ def save_selector_menu():
                 if click:
                     os.remove(os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\world7.save")
                     os.remove(os.getenv('APPDATA') + "\\" + world_loader.get_game_name() + "\minimap7.png")
-                    world_loader.worlds[0] = None
-                    world_loader.worlds_minimaps[0] = None
+                    world_loader.worlds_quick_load[7] = False
+                    world_loader.worlds_minimaps[7] = None
             screen.blit(last_time_played_text, (text_rect.x - 75, text_rect.y + 120))
             screen.blit(last_time_played_time, (text_rect.x - 75, text_rect.y + 140))
+        else:
+            text_rect = text_plus.get_rect(center=btn_save8.center)
+            screen.blit(text_plus, text_rect)
+
 
         pygame.draw.rect(screen, (0, 0, 0), btn_save1, 2)
         pygame.draw.rect(screen, (0, 0, 0), btn_save2, 2)
@@ -572,6 +590,7 @@ def save_selector_menu():
         pygame.display.flip()
 
         clock.tick(60)
+
 
 
 def options_menu():
@@ -830,10 +849,9 @@ def esc_menu():
         if btn_exit.collidepoint((mx, my)):
             screen.blit(button[1], btn_exit)
             if click:
-                pygame.quit()
-                #os.kill()
-                sys.exit()
-                #os.kill()
+                os.execl(sys.executable, sys.executable, *sys.argv)
+                #pygame.quit()
+                #sys.exit()
 
         a, b = btn_start.center
         btn_center = (a, b - 15)
@@ -859,11 +877,16 @@ def esc_menu():
 def play(game_save):
     if game_save is None:
         world = WorldGenerator(world_size, world_size).get_world()
+        minimap = pygame.image.load(world_loader.create_temporary_map(world))
+        minimap_head = pygame.image.load('images/Other/minimap_head.png').convert_alpha()
+
         player = Player(2000, 2000)
         drop_map = []
     else:
         #print("1")
         world = game_save[0]#copy.deepcopy(game_save[0])
+        minimap = pygame.image.load(world_loader.create_temporary_map(world))
+        minimap_head = pygame.image.load('images/Other/minimap_head.png').convert_alpha()
         #print("2")
         player = Player(2000, 2000)
         player.x = int(game_save[1][0])
@@ -1328,6 +1351,8 @@ def play(game_save):
 
     button_pressed = False
 
+    minimap_open = False
+
     #pygame.display.toggle_fullscreen()
 
     # -------- Main Program Loop -----------
@@ -1363,6 +1388,11 @@ def play(game_save):
                 if e.key == pygame.K_ESCAPE:
                     world_loader.save(world, player, drop_map)
                     esc_menu()
+                if e.key == pygame.K_m:
+                    if minimap_open:
+                        minimap_open = False
+                    else:
+                        minimap_open = True
 
             if e.type == pygame.QUIT:
                 global game_running
@@ -1413,6 +1443,13 @@ def play(game_save):
             #print("--- Night: %s seconds ---" % (time.time() - start_time))
 
             #print(night_filter)
+
+        if minimap_open:
+            minimap.set_alpha(220)
+            screen.blit(minimap, (0, 0))
+            #minimap_head.set_alpha(220)
+            screen.blit(minimap_head, (int(player.x / Cube_Size), int(player.y / Cube_Size)))
+
 
         pygame.display.flip()
 

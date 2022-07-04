@@ -17,7 +17,8 @@ class Worldloader:
         self.worlds_quick_load = [False, False, False, False, False, False, False, False]
         self.worlds = [None, None, None, None, None, None, None, None]
         self.worlds_minimaps = [None, None, None, None, None, None, None, None]
-        self.load()
+        #self.load()
+        self.quick_load()
         #side_load = threading.Thread(target=self.load)
         #side_load.start()
 
@@ -111,33 +112,71 @@ class Worldloader:
         start_time = time.time()
         if os.path.isfile(os.getenv('APPDATA') + "\\" + GAME_NAME + "\world0.save"):
             self.worlds_quick_load[0] = True
+            if os.path.isfile(os.getenv('APPDATA') + "\\" + GAME_NAME + "\minimap0.png"):
+                self.worlds_minimaps[0] = os.getenv('APPDATA') + "\\" + GAME_NAME + "\minimap0.png"
+            else:
+                self.worlds_minimaps[0] = self.map_to_img(self.load_world(0)[0], 0)
         if os.path.isfile(os.getenv('APPDATA') + "\\" + GAME_NAME + "\world1.save"):
             self.worlds_quick_load[1] = True
+            if os.path.isfile(os.getenv('APPDATA') + "\\" + GAME_NAME + "\minimap1.png"):
+                self.worlds_minimaps[1] = os.getenv('APPDATA') + "\\" + GAME_NAME + "\minimap1.png"
+            else:
+                self.worlds_minimaps[1] = self.map_to_img(self.load_world(1)[0], 1)
         if os.path.isfile(os.getenv('APPDATA') + "\\" + GAME_NAME + "\world2.save"):
             self.worlds_quick_load[2] = True
+            if os.path.isfile(os.getenv('APPDATA') + "\\" + GAME_NAME + "\minimap2.png"):
+                self.worlds_minimaps[2] = os.getenv('APPDATA') + "\\" + GAME_NAME + "\minimap2.png"
+            else:
+                self.worlds_minimaps[2] = self.map_to_img(self.load_world(2)[0], 2)
         if os.path.isfile(os.getenv('APPDATA') + "\\" + GAME_NAME + "\world3.save"):
             self.worlds_quick_load[3] = True
+            if os.path.isfile(os.getenv('APPDATA') + "\\" + GAME_NAME + "\minimap3.png"):
+                self.worlds_minimaps[3] = os.getenv('APPDATA') + "\\" + GAME_NAME + "\minimap3.png"
+            else:
+                self.worlds_minimaps[3] = self.map_to_img(self.load_world(3)[0], 3)
         if os.path.isfile(os.getenv('APPDATA') + "\\" + GAME_NAME + "\world4.save"):
             self.worlds_quick_load[4] = True
+            if os.path.isfile(os.getenv('APPDATA') + "\\" + GAME_NAME + "\minimap4.png"):
+                self.worlds_minimaps[4] = os.getenv('APPDATA') + "\\" + GAME_NAME + "\minimap4.png"
+            else:
+                self.worlds_minimaps[4] = self.map_to_img(self.load_world(4)[0], 4)
         if os.path.isfile(os.getenv('APPDATA') + "\\" + GAME_NAME + "\world5.save"):
             self.worlds_quick_load[5] = True
+            if os.path.isfile(os.getenv('APPDATA') + "\\" + GAME_NAME + "\minimap5.png"):
+                self.worlds_minimaps[5] = os.getenv('APPDATA') + "\\" + GAME_NAME + "\minimap5.png"
+            else:
+                self.worlds_minimaps[5] = self.map_to_img(self.load_world(5)[0], 5)
         if os.path.isfile(os.getenv('APPDATA') + "\\" + GAME_NAME + "\world6.save"):
             self.worlds_quick_load[6] = True
+            if os.path.isfile(os.getenv('APPDATA') + "\\" + GAME_NAME + "\minimap6.png"):
+                self.worlds_minimaps[6] = os.getenv('APPDATA') + "\\" + GAME_NAME + "\minimap6.png"
+            else:
+                self.worlds_minimaps[6] = self.map_to_img(self.load_world(6)[0], 6)
         if os.path.isfile(os.getenv('APPDATA') + "\\" + GAME_NAME + "\world7.save"):
             self.worlds_quick_load[7] = True
+            if os.path.isfile(os.getenv('APPDATA') + "\\" + GAME_NAME + "\minimap7.png"):
+                self.worlds_minimaps[7] = os.getenv('APPDATA') + "\\" + GAME_NAME + "\minimap7.png"
+            else:
+                self.worlds_minimaps[7] = self.map_to_img(self.load_world(7)[0], 7)
         print("--- Quick Loaded in: %s seconds ---" % (time.time() - start_time))
 
     def load_world(self, number):
+        start_time = time.time()
         try:
-            filename = os.getenv('APPDATA') + "\\" + GAME_NAME + "\world" + number + ".save"
+            filename = os.getenv('APPDATA') + "\\" + GAME_NAME + "\world" + str(number) + ".save"
+            print(filename)
             with open(filename, "rb") as f:
                 gc.disable()
-                self.worlds[number] = pickle.load(f)
+                world = pickle.load(f)
                 gc.enable()
-                self.worlds_minimaps[number] = self.map_to_img(self.worlds[1][0], 1)
+                print("--- World Loaded in: %s seconds ---" % (time.time() - start_time))
+                return world
         except:
+            print("--- Failed to load the World ---")
             pass
-        print("--- Loaded in: %s seconds ---" % (time.time() - start_time))
+
+
+
 
     def save(self, world, player, drop_map):
         # FORMAT: [World, Player, Drop Map, Last time played]
@@ -152,6 +191,27 @@ class Worldloader:
 
     def map_to_img(self, world, num):
         filename = os.getenv('APPDATA') + "\\" + GAME_NAME + "\minimap" + str(num) + ".png"
+        if not os.path.exists(filename):
+
+            data = np.zeros((len(world), len(world), 3), dtype=np.uint8)
+
+            for x in range(len(world)):
+                for y in range(len(world)):
+                    if world[x][y].id == 1:
+                        data[x, y] = [128, 165, 63]
+                    elif world[x][y].id == 2:
+                        data[x, y] = [252, 198, 3]
+                    elif world[x][y].id == 3:
+                        data[x, y] = [3, 190, 252]
+                    elif world[x][y].id == 4:
+                        data[x, y] = [255, 255, 255]
+
+            Image.fromarray(data).save(filename)
+
+        return filename
+
+    def create_temporary_map(self, world):
+        filename = os.getenv('APPDATA') + "\\" + GAME_NAME + "\minimap_temporary.png"
         if not os.path.exists(filename):
 
             data = np.zeros((len(world), len(world), 3), dtype=np.uint8)

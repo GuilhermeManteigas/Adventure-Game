@@ -41,19 +41,19 @@ class Options:
 
     def load(self):
         filename = os.getenv('APPDATA') + "\\" + GAME_NAME + "\options.save"
-        print(filename)
+        #print(filename)
         os.makedirs(os.path.dirname(filename), exist_ok=True)
         try:
             with open(filename, "rb") as f:
                 tmp_dict = pickle.load(f)
                 self.__dict__.update(tmp_dict)
-                print("loaded")
+                #print("loaded")
         except:
             pass
 
     def save(self):
         filename = os.getenv('APPDATA') + "\\" + GAME_NAME + "\options.save"
-        print(filename)
+        #print(filename)
         os.makedirs(os.path.dirname(filename), exist_ok=True)
         with open(filename, "wb") as f:
             pickle.dump(self.__dict__, f)
