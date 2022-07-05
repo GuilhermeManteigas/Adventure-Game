@@ -2,6 +2,7 @@ import threading
 import time
 import pygame
 from resources import Resources
+from random import randrange
 
 class Player():
 
@@ -18,11 +19,18 @@ class Player():
         self.images_left = []
         #self.load_sprites()
         self.image = self.images_idle[self.index]
+        self.hand_image = ""
+        self.hand_shake = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,6,6,6,6,6,6,6,6,6,6,6,7,7,7,7,7,7,7,7,7,7,7,7,6,6,6,6,6,6,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+        self.hand_movement = 0
         self.hitbox = 0
-        self.inventory = []
+        self.inventory = [None, None, None, None, None, None, None, None,
+                          None, None, None, None, None, None, None, None,
+                          None, None, None, None, None, None, None, None,
+                          None, None, None, None, None, None, None, None]
         self.inventory_full = False
         self.looking_direction = False
         self.last_move = time.time()
+        self.max_inventory_stack = 2
 
 
         #player_movement = threading.Thread(target=self.idle)
@@ -83,12 +91,51 @@ class Player():
         #self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_017.png').convert_alpha())
         #self.images_right.append(pygame.image.load('images/Player/Minotaur_01_Walking_017.png').convert_alpha())
 
+
     def get_image(self):
+        #print(self.hand_image)
+        temp = self.image.copy()
+        #img = pygame.image.load(self.hand_image)
+        #angle = -150 - self.hand_shake[self.hand_movement]
+        angle = 5 + self.hand_shake[self.hand_movement]
+
+        if self.hand_movement >= len(self.hand_shake)-1:
+            self.hand_movement = 0
+        self.hand_movement += 1
+        #self.hand_movement += 1
+        #angle = self.hand_movement
+
+        if self.hand_image != "":
+            #rotated_image = pygame.transform.rotate(self.hand_image, randrange(50))
+            #temp.blit(rotated_image, (56, 24))
+            # offset from pivot to center
+            #image_rect = self.hand_image.get_rect(bottomright=(56 + 27, 24 + 11))
+            #offset_center_to_pivot = pygame.math.Vector2((56+27, 24+11)) - image_rect.center
+
+            # roatated offset from pivot to center
+            #rotated_offset = offset_center_to_pivot.rotate(-angle)
+
+            # roatetd image center
+            #rotated_image_center = (50, 50)
+
+            # get a rotated image
+            #rotated_image = pygame.transform.rotate(self.hand_image, angle)
+            #rotated_image_rect = rotated_image.get_rect(center=rotated_image_center)
+            #temp.blit(rotated_image, rotated_image_rect) #(50,20))
+
+            rotated_image = pygame.transform.rotozoom(self.hand_image, -angle, 1)  # Rotate the image.
+            rotated_offset = pygame.math.Vector2(0, 0).rotate(angle)  # Rotate the offset vector.
+            # Add the offset vector to the center/pivot point to shift the rect.
+            rect = rotated_image.get_rect(center=(65, 50) + rotated_offset)
+            temp.blit(rotated_image, rect)
+
+
+
         if self.looking_direction:
-            return pygame.transform.flip(self.image, True, False)
+            return pygame.transform.flip(temp, True, False)
         else:
-            return self.image
-            pass
+            return temp
+
 
     def move(self, x, y):
         if self.x == x:
@@ -139,16 +186,27 @@ class Player():
     def add_to_inventory(self, drop):
         item_added = False
         for idx, i in enumerate(self.inventory):
-            if i[0] == drop[0]:
+            if i is not None and i[0] == drop[0] and i[1] < self.max_inventory_stack:
                 self.inventory[idx] = (i[0], i[1] + drop[1])
-                #i[1] += drop[1]
                 item_added = True
                 return True
         if not item_added:
-            if len(self.inventory) < 20:
-                self.inventory.append((drop[0], drop[1]))
-                return True
-            else:
-                self.inventory_full = True
-                return False
+            for idx, i in enumerate(self.inventory):
+                if i is None:
+                    self.inventory[idx] = (drop[0], drop[1])
+                    return True
 
+            print("Drop failed to be added to the inventory")
+            return False
+
+    def has_space_for_drop(self, drop):
+        item_added = False
+        for idx, i in enumerate(self.inventory):
+            if i is not None and i[0] == drop[0] and i[1] < self.max_inventory_stack:
+                item_added = True
+                return True
+        if not item_added:
+            for idx, i in enumerate(self.inventory):
+                if i is None:
+                    return True
+            return False

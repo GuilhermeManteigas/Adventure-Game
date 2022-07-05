@@ -1,8 +1,11 @@
 import random
+
+import drop
 from block import Block
 from entity import Entity
-from drop_list import Drop_list
+#from drop_list import Drop_list
 import time
+import drop_list as drop_list
 
 import cProfile
 
@@ -13,7 +16,7 @@ class WorldGenerator:
         self.width = width
         self.world = []
         self.generategui()
-        self.drop = Drop_list()
+        #self.drop = Drop_list()
 
     def generategui(self):
         height = self.height
@@ -189,20 +192,33 @@ class WorldGenerator:
                             block.height = 0
         print("--- Remove single block islands: %s seconds ---" % (time.time() - start_time))
 
-        # Generate Trees
+        # Generate Trees | Stones
         start_time = time.time()
         for i in range(height):
             for j in range(width):
                 block = world[i][j]
-                if block.id == 1 and random.randint(0, 100) == 1:
-                    block.entity = Entity(200, i, j, True, 4, [True, 400])
-                    block.entity.create_time = -5
-                elif block.id == 2 and random.randint(0, 100) == 1:
-                    block.entity = Entity(201, i, j, True, 4, [True, 400])
-                    block.entity.create_time = -5
-                elif block.id == 4 and random.randint(0, 100) == 1:
-                    block.entity = Entity(202, i, j, True, 4, [True, 400])
-                    block.entity.create_time = -5
+                if block.id != 3: # If The block its no water
+                    if block.id == 1 and random.randint(0, 100) == 1:
+                        block.entity = Entity(200, i, j, True, 4, [True, 400])
+                        block.entity.create_time = -5
+                    elif block.id == 2 and random.randint(0, 100) == 1:
+                        block.entity = Entity(201, i, j, True, 4, [True, 400])
+                        block.entity.create_time = -5
+                    elif block.id == 4 and random.randint(0, 100) == 1:
+                        block.entity = Entity(202, i, j, True, 4, [True, 400])
+                        block.entity.create_time = -5
+                    elif random.randint(0, 100) == 1:
+                        block.entity = Entity(210, i, j, True, 4, [False, 401])
+                        block.entity.create_time = -5
+                    elif random.randint(0, 100) == 1:
+                        block.entity = Entity(211, i, j, True, 4, [False, 402])
+                        block.entity.create_time = -5
+                    elif random.randint(0, 100) == 1:
+                        block.entity = Entity(212, i, j, True, 4, [False, 403])
+                        block.entity.create_time = -5
+                    elif random.randint(0, 100) == 1:
+                        block.entity = Entity(213, i, j, True, 4, [False, 404])
+                        block.entity.create_time = -5
         print("--- Generate Trees: %s seconds ---" % (time.time() - start_time))
 
 

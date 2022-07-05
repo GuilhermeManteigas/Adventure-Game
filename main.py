@@ -877,26 +877,30 @@ def esc_menu():
 def play(game_save):
     if game_save is None:
         world = WorldGenerator(world_size, world_size).get_world()
-        minimap = pygame.image.load(world_loader.create_temporary_map(world))
-        minimap_head = pygame.image.load('images/Other/minimap_head.png').convert_alpha()
-
         player = Player(2000, 2000)
         drop_map = []
     else:
-        #print("1")
         world = game_save[0]#copy.deepcopy(game_save[0])
-        minimap = pygame.image.load(world_loader.create_temporary_map(world))
-        minimap_head = pygame.image.load('images/Other/minimap_head.png').convert_alpha()
-        #print("2")
         player = Player(2000, 2000)
         player.x = int(game_save[1][0])
         player.y = int(game_save[1][1])
         player.health = int(game_save[1][2])
         player.inventory = game_save[1][3]
         player.inventory_full = game_save[1][4]
-        #print("3")
         drop_map = game_save[2]
-        #print("4")
+
+    minimap = pygame.image.load(world_loader.create_temporary_map(world)).convert()
+    minimap.set_alpha(220)
+    minimap_head = pygame.image.load('images/Other/minimap_head.png').convert_alpha()
+    inventory_image = [pygame.image.load('images/Inventory/inventory.jpg').convert(), pygame.image.load('images/Inventory/inventory_expanded.jpg').convert()]
+    inventory_image_selected = pygame.image.load('images/Inventory/inventory_selected_slot.jpg').convert()
+
+    inventory_font = pygame.font.SysFont("franklingothicmedium", 10)
+    inventory_font_color = pygame.Color("white")
+    inventory_selected_slot = 0
+
+    FPS_FONT = pygame.font.SysFont("Verdana", 15)
+    color = pygame.Color("white")
 
 
     global screen
@@ -952,11 +956,20 @@ def play(game_save):
 
             time.sleep(0.01)
 
+    ##### Experiment ##########
+    light = image_resources[600][0]
+    a, b = light.get_size()
+    light2 = pygame.Surface(light.get_size(),pygame.SRCALPHA)
+    #light2.convert_alpha()
+    light2.blit(light, (0, 0))
+    #############################
 
     def draw_entities():
         start_time = time.time()
         light = image_resources[600][0]
         a, b = light.get_size()
+
+
         mouse_x, mouse_y = mouse_position
 
         if night_value > 0:
@@ -989,7 +1002,8 @@ def play(game_save):
                     #print("--- Draw Entities 2.3: %s seconds ---" % (time.time() - start_time))
                     start_time = time.time()
                     if night_value > 0:
-                        night_filter.blit(light, (i.x * Cube_Size - scroll[0] - a/2, i.y * Cube_Size - scroll[1] - b/2))
+                        night_filter.blit(light, (i.x * Cube_Size - scroll[0] - a / 2, i.y * Cube_Size - scroll[1] - b / 2))
+                        #night_filter.blit(light, (i.x * Cube_Size - scroll[0] - a/2, i.y * Cube_Size - scroll[1] - b/2))
                     #print("--- Draw Entities 2.4: %s seconds ---" % (time.time() - start_time))
                     start_time = time.time()
         #print("--- Draw Entities 3: %s seconds ---" % (time.time() - start_time))
@@ -1001,8 +1015,6 @@ def play(game_save):
 
 
     def show_fps(window, clock):
-        FPS_FONT = pygame.font.SysFont("Verdana", 15)
-        color = pygame.Color("white")
         if options.fps:
             fps_overlay = FPS_FONT.render(str(int(clock.get_fps())), True, color)
             window.blit(fps_overlay, (1240, 0))
@@ -1017,13 +1029,16 @@ def play(game_save):
             x, y = i
             entity = world[x][y].entity
             if entity.id != 0:
+                #print(entity.drop_list.pop(0))
                 if entity.drop_list.pop(0):
                     for a in entity.drop_list:
                         for i in range(entity.entity_face + 1):
                             rand_x = random.randint(-30, 30)
                             rand_y = random.randint(-30, 30)
+                            print(entity.x * Cube_Size + rand_x, entity.y * Cube_Size + rand_y, a, 1, game_days)
                             drop_map.append(Drop(entity.x * Cube_Size + rand_x, entity.y * Cube_Size + rand_y, a, 1, game_days))
                 else:
+                    print("wtf")
                     for i in entity.drop_list:
                         rand_x = random.randint(-30, 30)
                         rand_y = random.randint(-30, 30)
@@ -1175,26 +1190,27 @@ def play(game_save):
             if not game_paused:
                 # Move drops to player
                 for i in drop_map_section:
-                    distance = (((player.x - i.x) ** 2) + ((player.y - i.y) ** 2)) ** 0.5
-                    if abs(distance) < 190:
-                        if player.x - Cube_Size - i.x < 0:
-                            i.x -= 4
-                        elif player.x - Cube_Size - i.x > 0:
-                            i.x += 4
+                    if player.has_space_for_drop((i.id, i.quantity)):
+                        distance = (((player.x - i.x) ** 2) + ((player.y - i.y) ** 2)) ** 0.5
+                        if abs(distance) < 190:
+                            if player.x - Cube_Size - i.x < 0:
+                                i.x -= 4
+                            elif player.x - Cube_Size - i.x > 0:
+                                i.x += 4
 
-                        if player.y - Cube_Size - i.y < 0:
-                            i.y -= 4
-                        elif player.y - Cube_Size - i.y > 0:
-                            i.y += 4
+                            if player.y - Cube_Size - i.y < 0:
+                                i.y -= 4
+                            elif player.y - Cube_Size - i.y > 0:
+                                i.y += 4
 
-                        if i.x - 35 < player.x - Cube_Size < i.x + 35 and i.y - 35 < player.y - Cube_Size < i.y + 35:
-                            player.add_to_inventory((i.id, i.quantity))
-                            try:
-                                drop_map.remove(i)
-                                drop_map_section.remove(i)
-                            except:
-                                print("problem")
-                            pass
+                            if i.x - 35 < player.x - Cube_Size < i.x + 35 and i.y - 35 < player.y - Cube_Size < i.y + 35:
+                                if player.add_to_inventory((i.id, i.quantity)):
+                                    try:
+                                        drop_map.remove(i)
+                                        drop_map_section.remove(i)
+                                    except:
+                                        print("problem")
+                                    pass
                 #print(player.inventory)
 
             time.sleep(0.01)
@@ -1352,6 +1368,7 @@ def play(game_save):
     button_pressed = False
 
     minimap_open = False
+    inventory_open = False
 
     #pygame.display.toggle_fullscreen()
 
@@ -1393,8 +1410,26 @@ def play(game_save):
                         minimap_open = False
                     else:
                         minimap_open = True
+                if e.key == pygame.K_e:
+                    if inventory_open:
+                        inventory_open = False
+                    else:
+                        inventory_open = True
 
-            if e.type == pygame.QUIT:
+            if e.type == pygame.MOUSEBUTTONDOWN:
+                if e.button == 4:
+                    #print(inventory_selected_slot)
+                    inventory_selected_slot -= 1
+                    if inventory_selected_slot < 0:
+                        inventory_selected_slot = 7
+                elif e.button == 5:
+                    #print(inventory_selected_slot)
+                    inventory_selected_slot += 1
+                    if inventory_selected_slot > 7:
+                        inventory_selected_slot = 0
+
+
+        if e.type == pygame.QUIT:
                 global game_running
                 world_loader.save(world, player, drop_map)
                 print("world saved")
@@ -1414,15 +1449,15 @@ def play(game_save):
         scroll[0] = int(scroll[0])
         scroll[1] = int(scroll[1])
         #print(scroll)
-        #print("--- A: %s seconds ---" % (time.time() - start_time))
+        print("--- A: %s seconds ---" % (time.time() - start_time))
 
         start_time = time.time()
         draw_world()
-        #print("--- Draw World: %s seconds ---" % (time.time() - start_time))
+        print("--- Draw World: %s seconds ---" % (time.time() - start_time))
         start_time = time.time()
         draw_entities()
         draw_drops()
-        #print("--- Draw Entities: %s seconds ---" % (time.time() - start_time))
+        print("--- Draw Entities: %s seconds ---" % (time.time() - start_time))
 
         start_time = time.time()
         rect = player.image.get_rect()
@@ -1430,25 +1465,76 @@ def play(game_save):
         player.hitbox = pygame.Rect(rect)
         screen.blit(player.get_image(), rect)
         pygame.draw.rect(screen, RED, rect, 1)
-        #print("--- Player: %s seconds ---" % (time.time() - start_time))
+        print("--- Player: %s seconds ---" % (time.time() - start_time))
         #screen.blit(player.image, (player.x - scroll[0], player.y - scroll[1]))
         start_time = time.time()
         show_fps(screen, clock)
-        #print("--- FPS: %s seconds ---" % (time.time() - start_time))
+        print("--- FPS: %s seconds ---" % (time.time() - start_time))
 
         if night_value > 0:
             start_time = time.time()
             screen.blit(night_filter, (0, 0), special_flags=pygame.BLEND_RGBA_SUB)
+            #screen.blit(night_filter, (0, 0), special_flags=pygame.BLEND_RGBA_SUB)
             #screen.blit(night_filter, (0, 0), special_flags=pygame.BLEND_SUB)
-            #print("--- Night: %s seconds ---" % (time.time() - start_time))
-
-            #print(night_filter)
+            print("--- Night: %s seconds ---" % (time.time() - start_time))
 
         if minimap_open:
-            minimap.set_alpha(220)
             screen.blit(minimap, (0, 0))
-            #minimap_head.set_alpha(220)
             screen.blit(minimap_head, (int(player.x / Cube_Size), int(player.y / Cube_Size)))
+
+        #print(player.inventory)
+
+        screen.blit(inventory_image[0], (850, 30))
+        #print(player.inventory)
+
+        for idx, i in enumerate(player.inventory):
+            if idx < 8:
+                if idx == inventory_selected_slot:
+                    screen.blit(inventory_image_selected, (850 + idx * 50, 30))
+                    if i is None:
+                        player.hand_image = ""
+                    else:
+                        player.hand_image = image_resources[i[0]][0]
+                if i != None:
+                    screen.blit(image_resources[i[0]][0], (860 + idx * 50, 40))
+                    quantity = inventory_font.render(str(i[1]), True, inventory_font_color)
+                    screen.blit(quantity, (857 + idx * 50, 35))
+
+            else:
+                break
+        if inventory_open:
+            screen.blit(inventory_image[1], (850, 85))
+            for idx, i in enumerate(player.inventory):
+                if 16 > idx >= 8:
+                    if idx == inventory_selected_slot:
+                        if i is None:
+                            player.hand_image = ""
+                        else:
+                            player.hand_image = image_resources[i[0]][0]
+                    if i != None:
+                        screen.blit(image_resources[i[0]][0], (860 + (idx - 8) * 50, 40 + 50))
+                        quantity = inventory_font.render(str(i[1]), True, inventory_font_color)
+                        screen.blit(quantity, (857 + (idx - 8) * 50, 35 + 50))
+                if 24 > idx >= 16:
+                    if idx == inventory_selected_slot:
+                        if i is None:
+                            player.hand_image = ""
+                        else:
+                            player.hand_image = image_resources[i[0]][0]
+                    if i != None:
+                        screen.blit(image_resources[i[0]][0], (860 + (idx - 16) * 50, 40 + 100))
+                        quantity = inventory_font.render(str(i[1]), True, inventory_font_color)
+                        screen.blit(quantity, (857 + (idx - 16) * 50, 35 + 100))
+                if 32 > idx >= 24:
+                    if idx == inventory_selected_slot:
+                        if i is None:
+                            player.hand_image = ""
+                        else:
+                            player.hand_image = image_resources[i[0]][0]
+                    if i != None:
+                        screen.blit(image_resources[i[0]][0], (860 + (idx - 24) * 50, 40 + 150))
+                        quantity = inventory_font.render(str(i[1]), True, inventory_font_color)
+                        screen.blit(quantity, (857 + (idx - 24) * 50, 35 + 150))
 
 
         pygame.display.flip()

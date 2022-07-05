@@ -1,0 +1,17 @@
+Todo:
+- Class sub class system for entities
+- Make inventory show items
+- Allow to change items position in inventory(rects per slot and on colide click highlight and then next one you press swaps them on the list)
+- Make item place down system 
+- Crafting system
+- Tools
+- Weapons
+- Improve animation engine
+- Passive mobs
+- Agressive mobs
+- Inventory armour slot (overlay armour parts like i did with item on hand)
+- Thread to spawn trees and rocks over time
+- Make sure player spawns on empty land
+- Bed / respawn system
+- Player life points and handle death
+- add flowers

@@ -80,11 +80,51 @@ class Resources:
                        pygame.image.load('images/Entities/snowtree/tree3.png').convert_alpha(),
                        pygame.image.load('images/Entities/snowtree/tree4.png').convert_alpha()]
 
+        images[210] = [pygame.image.load('images/Entities/stone/stone.png').convert_alpha(),
+                       pygame.image.load('images/Entities/stone/stone.png').convert_alpha(),
+                       pygame.image.load('images/Entities/stone/stone.png').convert_alpha(),
+                       pygame.image.load('images/Entities/stone/stone.png').convert_alpha()]
+
+        images[211] = [pygame.image.load('images/Entities/coal/coal.png').convert_alpha(),
+                       pygame.image.load('images/Entities/coal/coal.png').convert_alpha(),
+                       pygame.image.load('images/Entities/coal/coal.png').convert_alpha(),
+                       pygame.image.load('images/Entities/coal/coal.png').convert_alpha()]
+
+        images[212] = [pygame.image.load('images/Entities/iron/iron.png').convert_alpha(),
+                       pygame.image.load('images/Entities/iron/iron.png').convert_alpha(),
+                       pygame.image.load('images/Entities/iron/iron.png').convert_alpha(),
+                       pygame.image.load('images/Entities/iron/iron.png').convert_alpha()]
+
+        images[213] = [pygame.image.load('images/Entities/gold/gold.png').convert_alpha(),
+                       pygame.image.load('images/Entities/gold/gold.png').convert_alpha(),
+                       pygame.image.load('images/Entities/gold/gold.png').convert_alpha(),
+                       pygame.image.load('images/Entities/gold/gold.png').convert_alpha()]
+
         ############### Drops ##############################
         images[400] = [pygame.image.load('images/Drops/wood/wood1.png').convert_alpha(),
                        pygame.image.load('images/Drops/wood/wood2.png').convert_alpha(),
                        pygame.image.load('images/Drops/wood/wood3.png').convert_alpha(),
                        pygame.image.load('images/Drops/wood/wood4.png').convert_alpha()]
+
+        images[401] = [pygame.image.load('images/Drops/stone/stone1.png').convert_alpha(),
+                       pygame.image.load('images/Drops/stone/stone2.png').convert_alpha(),
+                       pygame.image.load('images/Drops/stone/stone3.png').convert_alpha(),
+                       pygame.image.load('images/Drops/stone/stone4.png').convert_alpha()]
+
+        images[402] = [pygame.image.load('images/Drops/coal/coal1.png').convert_alpha(),
+                       pygame.image.load('images/Drops/coal/coal2.png').convert_alpha(),
+                       pygame.image.load('images/Drops/coal/coal2.png').convert_alpha(),
+                       pygame.image.load('images/Drops/coal/coal2.png').convert_alpha()]
+
+        images[403] = [pygame.image.load('images/Drops/iron_ore/iron_ore1.png').convert_alpha(),
+                       pygame.image.load('images/Drops/iron_ore/iron_ore2.png').convert_alpha(),
+                       pygame.image.load('images/Drops/iron_ore/iron_ore2.png').convert_alpha(),
+                       pygame.image.load('images/Drops/iron_ore/iron_ore2.png').convert_alpha()]
+
+        images[404] = [pygame.image.load('images/Drops/gold_ore/gold_ore1.png').convert_alpha(),
+                       pygame.image.load('images/Drops/gold_ore/gold_ore2.png').convert_alpha(),
+                       pygame.image.load('images/Drops/gold_ore/gold_ore2.png').convert_alpha(),
+                       pygame.image.load('images/Drops/gold_ore/gold_ore2.png').convert_alpha()]
 
         ############### Extra ##############################
         images[600] = [pygame.image.load('images/Other/light.png').convert_alpha()]
