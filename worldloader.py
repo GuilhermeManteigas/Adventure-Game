@@ -175,10 +175,7 @@ class Worldloader:
             print("--- Failed to load the World ---")
             pass
 
-
-
-
-    def save(self, world, player, drop_map):
+    def save_thread(self, world, player, drop_map):
         # FORMAT: [World, Player, Drop Map, Last time played]
         today = date.today()
         p = [player.x, player.y, player.health, player.inventory, player.inventory_full]
@@ -187,7 +184,32 @@ class Worldloader:
         os.makedirs(os.path.dirname(filename), exist_ok=True)
         with open(filename, "wb") as f:
             save = [world, p, drop_map, today.strftime("%d/%m/%Y")]
-            pickle.dump(save, f, protocol=pickle.HIGHEST_PROTOCOL)
+            print(pickle.dump(save, f, protocol=pickle.HIGHEST_PROTOCOL))
+
+    currently_saving = False
+    def save(self, world, player, drop_map):
+        while self.currently_saving:
+            print("sleeping")
+            time.sleep(1)
+        self.currently_saving = True
+        save_t = threading.Thread(target=self.save_thread(world, player, drop_map))
+        save_t.daemon = True
+        save_t.start()
+        # FORMAT: [World, Player, Drop Map, Last time played]
+        #today = date.today()
+        #p = [player.x, player.y, player.health, player.inventory, player.inventory_full]
+        #filename = os.getenv('APPDATA') + "\\" + GAME_NAME + "\world" + str(self.world_in_use) + ".save"
+        #print(filename)
+        #os.makedirs(os.path.dirname(filename), exist_ok=True)
+        #with open(filename, "wb") as f:
+            #save = [world, p, drop_map, today.strftime("%d/%m/%Y")]
+            #gc.disable()
+            #print(pickle.dump(save, f, protocol=pickle.HIGHEST_PROTOCOL))
+            #gc.enable()
+            #f.close()
+        self.currently_saving = False
+
+
 
     def map_to_img(self, world, num):
         filename = os.getenv('APPDATA') + "\\" + GAME_NAME + "\minimap" + str(num) + ".png"

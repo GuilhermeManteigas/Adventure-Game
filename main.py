@@ -934,7 +934,7 @@ def play(game_save):
             #print("--- Update world: %s seconds ---" % (time.time() - start_time))
 
 
-    def draw_world():
+    def draw_worldold():
         global world_section_entities
         temp_world_section_entities = []
         for i in world_section:
@@ -943,6 +943,33 @@ def play(game_save):
             if i.entity.id != 0:
                 temp_world_section_entities.append(i)
         world_section_entities = temp_world_section_entities[:]
+
+###################################### TEST #######################################################
+
+    def draw_world():
+        for i in world_section:
+            screen.blit(image_resources[i.id][i.block_face], (i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1]))
+
+
+    def draw_world_backload_handler():
+        while game_running:
+            if not game_paused:
+                global world_section_entities
+                temp_world_section_entities = []
+                for i in world_section:
+                    if i.entity.id != 0:
+                        temp_world_section_entities.append(i)
+                world_section_entities = temp_world_section_entities[:]
+            time.sleep(0.1)
+
+
+
+
+    draw_world_backload = threading.Thread(target=draw_world_backload_handler)
+    draw_world_backload.daemon = True
+    draw_world_backload.start()
+###################################################################################################
+
 
 
     def entities_update_handler():
@@ -956,65 +983,49 @@ def play(game_save):
 
             time.sleep(0.01)
 
-    ##### Experiment ##########
+    ##### Making light a surface before using it ########## (Still not sure if runs faster or not lol)
     light = image_resources[600][0]
-    a, b = light.get_size()
-    light2 = pygame.Surface(light.get_size(),pygame.SRCALPHA)
-    #light2.convert_alpha()
+    light_width, light_height = light.get_size()
+    light2 = pygame.Surface(light.get_size(), pygame.SRCALPHA)
     light2.blit(light, (0, 0))
     #############################
-
     def draw_entities():
-        start_time = time.time()
-        light = image_resources[600][0]
-        a, b = light.get_size()
-
-
         mouse_x, mouse_y = mouse_position
 
         if night_value > 0:
             night_filter.fill((night_value, night_value, night_value))
-        #print("--- Draw Entities 1: %s seconds ---" % (time.time() - start_time))
-        start_time = time.time()
-        #entity_remover()
-        #print("--- Draw Entities 2: %s seconds ---" % (time.time() - start_time))
-        start_time = time.time()
         for i in world_section_entities:
-                if i.entity.id != 0:
-                    if i.x == mouse_x and i.y == mouse_y:
-                        # Draw Marker
-                        screen.blit(image_resources[601][0], (i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1]))
-                    #print("--- Draw Entities 2.1: %s seconds ---" % (time.time() - start_time))
-                    start_time = time.time()
-                    #i.entity.update(game_days)
-                    screen.blit(image_resources[i.entity.id][i.entity.entity_face], (i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1] - image_resources[i.entity.id][i.entity.entity_face].get_height() + Cube_Size))
-                    #i.entity.hitbox = pygame.Rect((i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1]), (Cube_Size, Cube_Size))
-                    #print("--- Draw Entities 2.2: %s seconds ---" % (time.time() - start_time))
-                    start_time = time.time()
-                    if i.entity.health < i.entity.max_health:
-                        # Draw grey back
-                        pygame.draw.rect(screen, (30, 30, 30), (i.x * Cube_Size - scroll[0] - 2, i.y * Cube_Size - scroll[1] + Cube_Size + 10 - 2, 30 + 4, 5 + 4))
-                        # Draw life Green/Red
-                        if i.entity.health >= i.entity.max_health/2:
-                            pygame.draw.rect(screen, (127, 255, 0), (i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1] + Cube_Size + 10, i.entity.health / 3.3, 5))
-                        else:
-                            pygame.draw.rect(screen, (255, 0, 0), (i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1] + Cube_Size + 10, i.entity.health / 3.3, 5))
-                    #print("--- Draw Entities 2.3: %s seconds ---" % (time.time() - start_time))
-                    start_time = time.time()
-                    if night_value > 0:
-                        night_filter.blit(light, (i.x * Cube_Size - scroll[0] - a / 2, i.y * Cube_Size - scroll[1] - b / 2))
-                        #night_filter.blit(light, (i.x * Cube_Size - scroll[0] - a/2, i.y * Cube_Size - scroll[1] - b/2))
-                    #print("--- Draw Entities 2.4: %s seconds ---" % (time.time() - start_time))
-                    start_time = time.time()
-        #print("--- Draw Entities 3: %s seconds ---" % (time.time() - start_time))
+            if i.entity.id != 0:
+                if i.x == mouse_x and i.y == mouse_y:
+                    # Draw Marker
+                    screen.blit(image_resources[601][0], (i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1]))
+                #print(image_resources[i.entity.id][i.entity.entity_face], (i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1] - image_resources[i.entity.id][i.entity.entity_face].get_height() + Cube_Size))
+                screen.blit(image_resources[i.entity.id][i.entity.entity_face], (i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1] - image_resources[i.entity.id][i.entity.entity_face].get_height() + Cube_Size))
+                if i.entity.health < i.entity.max_health:
+                    # Draw grey back
+                    pygame.draw.rect(screen, (30, 30, 30), (i.x * Cube_Size - scroll[0] - 2, i.y * Cube_Size - scroll[1] + Cube_Size + 10 - 2, 30 + 4, 5 + 4))
+                    # Draw life Green/Red
+                    if i.entity.health >= i.entity.max_health/2:
+                        pygame.draw.rect(screen, (127, 255, 0), (i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1] + Cube_Size + 10, i.entity.health / 3.3, 5))
+                    else:
+                        pygame.draw.rect(screen, (255, 0, 0), (i.x * Cube_Size - scroll[0], i.y * Cube_Size - scroll[1] + Cube_Size + 10, i.entity.health / 3.3, 5))
+
+                if night_value > 0:
+                    night_filter.blit(light2, (i.x * Cube_Size - scroll[0] - light_width / 2, i.y * Cube_Size - scroll[1] - light_height / 2))
+
 
 
     def draw_drops():
         for i in drop_map_section:
             screen.blit(image_resources[i.id][i.face], (i.x - scroll[0], i.y - scroll[1] - image_resources[i.id][i.face].get_height() + Cube_Size))
 
-
+    fps_reads_day = []
+    fps_reads_night = []
     def show_fps(window, clock):
+        if night_value > 0:
+            fps_reads_night.append(int(clock.get_fps()))
+        else:
+            fps_reads_day.append(int(clock.get_fps()))
         if options.fps:
             fps_overlay = FPS_FONT.render(str(int(clock.get_fps())), True, color)
             window.blit(fps_overlay, (1240, 0))
@@ -1052,23 +1063,17 @@ def play(game_save):
 
     def collision_checker(x, y):
         map_size = len(world)
-        result = False
-
         if world[int(x / 30)][int(y / 30)].entity.collision:
             pass
         elif world[int(x/30)][int(y/30)].collision:
-            #if world[int(x/30)][int(player.y/30)].collision:
-                #player.move(x, player.y)
-            #if world[int(player.x/30)][int(y/30)].collision:
-                #player.move(player.x, y)
             pass
         elif int(x/30) < 25 or int(y/30) < 20 or int(x/30) > map_size - 25 or int(y/30) > map_size - 20:
             pass
         else:
             player.move(x, y)
-            result = True
+            return True
 
-        return result
+        return False
 
 
 
@@ -1369,21 +1374,13 @@ def play(game_save):
 
     minimap_open = False
     inventory_open = False
+    last_time_esc_pressed = 0
 
     #pygame.display.toggle_fullscreen()
 
     # -------- Main Program Loop -----------
     while playing:
-        # --- Main event loop
-        #for event in pygame.event.get():  # User did something
-            #if event.type == pygame.QUIT:  # If user clicked close
-                #playing = False  # Flag that we are done so we exit this loop
-            #if (event.type is pygame.KEYDOWN and event.key == pygame.K_f):
-                #print("f")
-                #if screen.get_flags() & pygame.FULLSCREEN:
-                    #pygame.display.set_mode(size)
-                #else:
-                    #pygame.display.set_mode(size, pygame.FULLSCREEN)
+
         for e in pygame.event.get():
             if e.type == pygame.KEYDOWN:
                 if e.key == pygame.K_F2:
@@ -1391,20 +1388,20 @@ def play(game_save):
                         options.update_fullscreen()
                         screen = pygame.display.set_mode(size, pygame.SCALED | pygame.FULLSCREEN)
                     else:
-                        #player_movement.start()
-                        #mouse_movement.start()
-                        #mouse_clicker.start()
-
                         options.update_fullscreen()
-                        #pygame.display.quit()
-                        #pygame.display.get_init()
-                        #pygame.display.toggle_fullscreen()
-                        #os.environ["SDL_VIDEO_CENTERED"] = "1"
                         screen = pygame.display.set_mode(size, pygame.SCALED)
-                    #screen = pygame.display.set_mode(size, pygame.SCALED | pygame.FULLSCREEN)
                 if e.key == pygame.K_ESCAPE:
-                    world_loader.save(world, player, drop_map)
-                    esc_menu()
+                    print(time.time() - last_time_esc_pressed)
+                    if time.time() - last_time_esc_pressed > 2:
+                        last_time_esc_pressed = time.time()
+                        print("MAX FPS DAY: " + str(max(fps_reads_day)))
+                        print("MIN FPS DAY: " + str(min(fps_reads_day)))
+                        print("AVERAGE FPS DAY: " + str(sum(fps_reads_day) / len(fps_reads_day)))
+                        print("MAX FPS NIGHT: " + str(max(fps_reads_night)))
+                        print("MIN FPS NIGHT: " + str(min(fps_reads_night)))
+                        print("AVERAGE FPS NIGHT: " + str(sum(fps_reads_night) / len(fps_reads_night)))
+                        world_loader.save(world, player, drop_map)
+                        esc_menu()
                 if e.key == pygame.K_m:
                     if minimap_open:
                         minimap_open = False
@@ -1415,24 +1412,18 @@ def play(game_save):
                         inventory_open = False
                     else:
                         inventory_open = True
-
             if e.type == pygame.MOUSEBUTTONDOWN:
-                if e.button == 4:
-                    #print(inventory_selected_slot)
+                if e.button == 4:  #Scroll wheel
                     inventory_selected_slot -= 1
                     if inventory_selected_slot < 0:
                         inventory_selected_slot = 7
-                elif e.button == 5:
-                    #print(inventory_selected_slot)
+                elif e.button == 5:  #Scroll wheel
                     inventory_selected_slot += 1
                     if inventory_selected_slot > 7:
                         inventory_selected_slot = 0
-
-
-        if e.type == pygame.QUIT:
+            if e.type == pygame.QUIT:
                 global game_running
                 world_loader.save(world, player, drop_map)
-                print("world saved")
                 playing = False
                 game_running = False
                 pygame.quit()
@@ -1449,15 +1440,15 @@ def play(game_save):
         scroll[0] = int(scroll[0])
         scroll[1] = int(scroll[1])
         #print(scroll)
-        print("--- A: %s seconds ---" % (time.time() - start_time))
+        #print("--- A: %s seconds ---" % (time.time() - start_time))
 
         start_time = time.time()
         draw_world()
-        print("--- Draw World: %s seconds ---" % (time.time() - start_time))
+        #print("--- Draw World: %s seconds ---" % (time.time() - start_time))
         start_time = time.time()
         draw_entities()
         draw_drops()
-        print("--- Draw Entities: %s seconds ---" % (time.time() - start_time))
+        #print("--- Draw Entities: %s seconds ---" % (time.time() - start_time))
 
         start_time = time.time()
         rect = player.image.get_rect()
@@ -1465,18 +1456,18 @@ def play(game_save):
         player.hitbox = pygame.Rect(rect)
         screen.blit(player.get_image(), rect)
         pygame.draw.rect(screen, RED, rect, 1)
-        print("--- Player: %s seconds ---" % (time.time() - start_time))
+        #print("--- Player: %s seconds ---" % (time.time() - start_time))
         #screen.blit(player.image, (player.x - scroll[0], player.y - scroll[1]))
         start_time = time.time()
         show_fps(screen, clock)
-        print("--- FPS: %s seconds ---" % (time.time() - start_time))
+        #print("--- FPS: %s seconds ---" % (time.time() - start_time))
 
         if night_value > 0:
             start_time = time.time()
             screen.blit(night_filter, (0, 0), special_flags=pygame.BLEND_RGBA_SUB)
             #screen.blit(night_filter, (0, 0), special_flags=pygame.BLEND_RGBA_SUB)
             #screen.blit(night_filter, (0, 0), special_flags=pygame.BLEND_SUB)
-            print("--- Night: %s seconds ---" % (time.time() - start_time))
+            #print("--- Night: %s seconds ---" % (time.time() - start_time))
 
         if minimap_open:
             screen.blit(minimap, (0, 0))
