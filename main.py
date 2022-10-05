@@ -916,7 +916,7 @@ def play(game_save):
         while playing:
             visible_area_x = int(player.x / 30)
             visible_area_y = int(player.y / 30)
-            world_section = [world[x][y] for x in range(visible_area_x - 30, visible_area_x + 30) for y in range(visible_area_y - 30, visible_area_y + 30) if 0 <= x < map_size and 0 <= y < map_size]
+            world_section = [world[x][y] for x in range(visible_area_x - 26, visible_area_x + 27) for y in range(visible_area_y - 20, visible_area_y + 20) if 0 <= x < map_size and 0 <= y < map_size]
 
             time.sleep(Game_Tick*5)
 
@@ -965,7 +965,7 @@ def play(game_save):
     def draw_entities():
         mouse_x, mouse_y = mouse_position
         half_light = light_width / 2
-
+        counter_test = 0
         if night_value > 0:
             night_filter.fill((night_value, night_value, night_value))
         for i in world_section_entities:
@@ -987,6 +987,8 @@ def play(game_save):
 
                 if night_value > 0:
                     night_filter.blit(light2, (block_x_pos - half_light, block_y_pos - half_light))
+                    counter_test += 1
+        print(counter_test,len(world_section_entities))
 
 
     def draw_drops():
