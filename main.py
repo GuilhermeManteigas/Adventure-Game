@@ -965,7 +965,6 @@ def play(game_save):
     def draw_entities():
         mouse_x, mouse_y = mouse_position
         half_light = light_width / 2
-        counter_test = 0
         if night_value > 0:
             night_filter.fill((night_value, night_value, night_value))
         for i in world_section_entities:
@@ -987,8 +986,6 @@ def play(game_save):
 
                 if night_value > 0:
                     night_filter.blit(light2, (block_x_pos - half_light, block_y_pos - half_light))
-                    counter_test += 1
-        print(counter_test,len(world_section_entities))
 
 
     def draw_drops():
@@ -1036,7 +1033,6 @@ def play(game_save):
                 entity.destroy()
 
         entities_to_remove.clear()
-
 
     def collision_checker(x, y):
         map_size = len(world)
@@ -1420,15 +1416,15 @@ def play(game_save):
         scroll[0] = int(scroll[0])
         scroll[1] = int(scroll[1])
         #print(scroll)
-        #print("--- A: %s seconds ---" % (time.time() - start_time))
+        print("--- A: %s seconds ---" % (time.time() - start_time))
 
         start_time = time.time()
         draw_world()
-        #print("--- Draw World: %s seconds ---" % (time.time() - start_time))
+        print("--- Draw World: %s seconds ---" % (time.time() - start_time))
         start_time = time.time()
         draw_entities()
         draw_drops()
-        #print("--- Draw Entities: %s seconds ---" % (time.time() - start_time))
+        print("--- Draw Entities: %s seconds ---" % (time.time() - start_time))
 
         start_time = time.time()
         rect = player.image.get_rect()
@@ -1436,17 +1432,15 @@ def play(game_save):
         player.hitbox = pygame.Rect(rect)
         screen.blit(player.get_image(), rect)
         pygame.draw.rect(screen, RED, rect, 1)
-        #print("--- Player: %s seconds ---" % (time.time() - start_time))
+        print("--- Player: %s seconds ---" % (time.time() - start_time))
         #screen.blit(player.image, (player.x - scroll[0], player.y - scroll[1]))
         start_time = time.time()
         show_fps(screen, clock)
-        #print("--- FPS: %s seconds ---" % (time.time() - start_time))
+        print("--- FPS: %s seconds ---" % (time.time() - start_time))
 
         if night_value > 0:
             start_time = time.time()
             screen.blit(night_filter, (0, 0), special_flags=pygame.BLEND_RGBA_SUB)
-            #screen.blit(night_filter, (0, 0), special_flags=pygame.BLEND_RGBA_SUB)
-            #screen.blit(night_filter, (0, 0), special_flags=pygame.BLEND_SUB)
             #print("--- Night: %s seconds ---" % (time.time() - start_time))
 
         if minimap_open:
@@ -1510,7 +1504,7 @@ def play(game_save):
 
         pygame.display.flip()
 
-        clock.tick(120)
+        clock.tick(60)
 
 
 main_menu()
